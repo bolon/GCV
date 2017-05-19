@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.rere.fish.gcv.PreviewActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/alphaGray30">
+
+        <com.theartofdev.edmodo.cropper.CropImageView
+            android:id="@+id/cropImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cropBackgroundColor="@color/alphaRed40"
+            app:cropBorderCornerColor="@android:color/holo_blue_bright"
+            app:cropBorderCornerOffset="0dp"
+            app:cropBorderCornerThickness="5dp"
+            app:cropBorderLineThickness="1dp"
+            app:cropGuidelines="on"
+            app:cropInitialCropWindowPaddingRatio="0"
+            app:cropSnapRadius="0dp" />
+
+        <!--app:cropBorderLineColor="@android:color/holo_green_light"-->
+        <!--app:cropGuidelinesColor="@android:color/holo_red_dark"-->
+
+    </FrameLayout>
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">GCV</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="hello_blank_fragment">Hello dashboard frag</string>
+    <string name="hello_blank_fragment_gar">Hello notif frag</string>
+
+    <string name="title_activity_preview">PreviewActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="all_permissions_denied_feedback">Please allow all permission</string>
+</resources>
