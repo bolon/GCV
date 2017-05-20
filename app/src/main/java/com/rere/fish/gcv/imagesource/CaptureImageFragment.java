@@ -2,7 +2,6 @@ package com.rere.fish.gcv.imagesource;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,8 +28,8 @@ import com.karumi.dexter.listener.multi.CompositeMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 import com.rere.fish.gcv.OnFragmentInteractionListener;
-import com.rere.fish.gcv.PreviewActivity;
 import com.rere.fish.gcv.R;
+import com.rere.fish.gcv.camera.AdditionalCameraTaskImpl;
 import com.rere.fish.gcv.uicustoms.CircularPulsingButton;
 
 import java.util.List;
@@ -39,6 +38,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
+
+import static android.view.View.GONE;
 
 
 /**
@@ -64,6 +65,7 @@ public class CaptureImageFragment extends Fragment {
     RelativeLayout rePermissionLayout;
     private OnFragmentInteractionListener mListener;
 
+    private AdditionalCameraTaskImpl additionalCameraTask;
     private MultiplePermissionsListener multiplePermissionsListener;
 
     public CaptureImageFragment() {
@@ -106,9 +108,8 @@ public class CaptureImageFragment extends Fragment {
                             .build()))
                     .withErrorListener(error -> Timber.e("Error request permission " + error.toString()))
                     .check();
-        }
-        else {
-            rePermissionLayout.setVisibility(View.GONE);
+        } else {
+            rePermissionLayout.setVisibility(GONE);
         }
 
     }
@@ -116,6 +117,9 @@ public class CaptureImageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        additionalCameraTask = new AdditionalCameraTaskImpl(getActivity());
+
         multiplePermissionsListener = new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -123,14 +127,14 @@ public class CaptureImageFragment extends Fragment {
                     for (PermissionDeniedResponse p : report.getDeniedPermissionResponses()) {
                         Timber.i("denied " + p.getPermissionName());
                     }
+                } else {
+                    rePermissionLayout.setVisibility(GONE);
                 }
-
-                areAllPermissionsGranted = report.areAllPermissionsGranted();
             }
 
             @Override
             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                Snackbar.make(parentLayout, "You must allow all permission", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(parentLayout, "Please manually allow permission(s) from settings", Snackbar.LENGTH_SHORT).show();
                 token.cancelPermissionRequest();
 
             }
@@ -193,11 +197,13 @@ public class CaptureImageFragment extends Fragment {
                 super.onPictureTaken(picture);
 
                 Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+
+                additionalCameraTask.onFinishCamera(result);
+                //startActivity(PreviewActivity.createIntent(getActivity(), result));
             }
         });
 
         cameraView.captureImage();
-        startActivity(new Intent(getActivity(), PreviewActivity.class));
     }
 
     @Override
@@ -210,8 +216,9 @@ public class CaptureImageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (checkPermission())
+        if (checkPermission()) {
             cameraView.start();
+        }
     }
 
     @Override

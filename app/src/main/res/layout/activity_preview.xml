@@ -15,7 +15,7 @@
             android:id="@+id/cropImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cropBackgroundColor="@color/alphaRed40"
+            app:cropBackgroundColor="@color/alphaGray80"
             app:cropBorderCornerColor="@android:color/holo_blue_bright"
             app:cropBorderCornerOffset="0dp"
             app:cropBorderCornerThickness="5dp"
