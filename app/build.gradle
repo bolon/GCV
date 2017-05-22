@@ -60,7 +60,6 @@ dependencies {
 
     compile "com.squareup.retrofit2:retrofit:$retrofit2Version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit2Version"
-    compile "com.squareup.retrofit2:converter-scalars:$retrofit2Version"
 
     compile "com.squareup.okhttp3:okhttp:$okHttpVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
