@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         return item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    //TODO : CHECK THE FUCKING PERMISSION
+                    //TODO : CHECK THE PERMISSION
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         navigation.setBackgroundColor(getColor(R.color.transparent));
@@ -165,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 .withButtonText(android.R.string.ok)
                 //.withIcon(R.mipmap.my_icon)
                 .build();
+
+
 
         MultiplePermissionsListener readStorage = DialogOnAnyDeniedMultiplePermissionsListener.Builder
                 .withContext(this)

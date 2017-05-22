@@ -2,9 +2,9 @@
 <resources>
     <color name="transparent">#00000000</color>
 
-    <color name="colorPrimary">#f06292</color>
-    <color name="colorPrimaryDark">#ba2d65</color>
-    <color name="colorPrimaryLight">#ff94c2</color>
+    <color name="colorPrimary">#813a52</color>
+    <color name="colorPrimaryDark">#6e1437</color>
+    <color name="colorPrimaryLight">#a35174</color>
 
     <color name="colorSecondary">#78909c</color>
     <color name="colorSecondaryDark">#4b636e</color>
@@ -13,7 +13,7 @@
     <color name="colorTextPrimary">#eceff1</color>
     <color name="colorTextSecondary">#e1f5fe</color>
 
-    <color name="colorAccent">#a8a3d9</color>
+    <color name="colorAccent">#dddce7</color>
 
     <color name="alphaGray80">#61888888</color>
     <color name="alphaGray60">#99888888</color>

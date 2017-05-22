@@ -2,9 +2,11 @@ package com.rere.fish.gcv.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.media.ExifInterface;
 
 import com.rere.fish.gcv.PreviewActivity;
 
@@ -15,6 +17,10 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import timber.log.Timber;
+
+import static android.support.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.support.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.support.media.ExifInterface.ORIENTATION_ROTATE_90;
 
 /**
  * Created by Android dev on 5/20/17.
@@ -58,10 +64,16 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
 
         void saveImageToDirectory(String path, Bitmap bmp) {
             FileOutputStream out = null;
+
             try {
                 out = new FileOutputStream(path);
                 // PNG is a lossless format, the compression factor (100) is ignored
-                bmp.compress(Bitmap.CompressFormat.JPEG, 70, out); // bmp is your Bitmap instance
+                Matrix matrix = new Matrix();
+                matrix.setRotate(90, (float) bmp.getWidth() / 2, (float) bmp.getHeight() / 2);
+
+                bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 80, out); // bmp is your Bitmap instance
+
                 scanImageToGallery(path);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -69,6 +81,7 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
                 try {
                     if (out != null) {
                         out.close();
+                        bmp.recycle();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -82,6 +95,32 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
 
         String generateRandomString() {
             return new BigInteger(80, new SecureRandom()).toString(32) + ".png";
+        }
+
+        int getRotationImage(String path) {
+            File f = new File(path);
+            try {
+                ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                int rotationAlign = 0;
+
+                switch (orientation) {
+                    case ORIENTATION_ROTATE_270:
+                        rotationAlign = 270;
+                        break;
+                    case ORIENTATION_ROTATE_180:
+                        rotationAlign = 180;
+                        break;
+                    case ORIENTATION_ROTATE_90:
+                        rotationAlign = 90;
+                        break;
+                }
+
+                return rotationAlign;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return 0;
+            }
         }
     }
 }

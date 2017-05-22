@@ -70,7 +70,6 @@ public class CaptureImageFragment extends Fragment {
 
     public CaptureImageFragment() {
         // Required empty public constructor
-        Log.d("called_first", "here");
     }
 
     /**

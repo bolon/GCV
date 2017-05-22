@@ -37,7 +37,7 @@ android {
 }
 
 def supportLibraryVersion = '25.3.1'
-def retrofit2Version = '2.2.0'
+def retrofit2Version = '2.3.0'
 def gsonVersion = '2.7'
 def iconifyVersion = '2.2.2'
 def timberVersion = '4.5.1'
@@ -60,6 +60,7 @@ dependencies {
 
     compile "com.squareup.retrofit2:retrofit:$retrofit2Version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit2Version"
+    compile "com.squareup.retrofit2:converter-scalars:$retrofit2Version"
 
     compile "com.squareup.okhttp3:okhttp:$okHttpVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
@@ -67,6 +68,7 @@ dependencies {
     compile "com.jakewharton.timber:timber:$timberVersion"
     compile "com.joanzapata.iconify:android-iconify-fontawesome:$iconifyVersion"
     //try lottie pls nnd
+    compile 'com.airbnb.android:lottie:2.0.0-rc1'
 
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
@@ -82,8 +84,13 @@ dependencies {
     //compile "com.flurgle:camerakit:$cameraKitVersion"
     compile "com.flurgle:camerakit:${rootProject.ext.cameraKitVersion}"
 
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
-    compile 'com.android.support:support-v4:25.3.1'
+    // https://mvnrepository.com/artifact/com.google.apis/google-api-services-vision
+    compile('com.google.apis:google-api-services-vision:v1-rev2-1.21.0') {
+        exclude group: 'org.apache.httpcomponents'  //avoid conflict with android http version
+        exclude group: 'com.google.code.findbugs'
+    }
+
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
     testCompile 'junit:junit:4.12'
 }

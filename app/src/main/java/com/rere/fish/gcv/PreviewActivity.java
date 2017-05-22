@@ -8,7 +8,13 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.rere.fish.gcv.modules.SelfServiceInterface;
+import com.rere.fish.gcv.result.ResultActivity;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -16,9 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class PreviewActivity extends AppCompatActivity {
     private static String FILE_NAME = "vader3.png";
     private static String EXTRA_INTENT_IMAGE = "EXTRA_IMAGE";
+    @BindView(R.id.toolbarPreviewActivity)
+    Toolbar toolbar;
+    @Inject
+    SelfServiceInterface selfServiceInterface;
     private CropImageView cropImageView;
     private String pathToFile;
 
@@ -34,13 +49,21 @@ public class PreviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_preview);
         cropImageView = (CropImageView) findViewById(R.id.cropImageView);
 
+        App.get(getApplicationContext()).getInjector().inject(this);
+        ButterKnife.bind(this);
 
-        Uri uri = Uri.fromFile(new File("//android_asset/vader2.jpeg"));
 /*        CropImage.activity(uri)
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .start(this);*/
-
         pathToFile = getIntent().getStringExtra(EXTRA_INTENT_IMAGE);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        toolbar.setNavigationIcon(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
+        toolbar.setNavigationIcon(new IconDrawable(this, FontAwesomeIcons.fa_close).colorRes(R.color.colorAccent).actionBarSize());
 
         try {
             InputStream is = getApplicationContext().getAssets().open(FILE_NAME);
@@ -48,6 +71,22 @@ public class PreviewActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.navigation_preview, menu);
+
+        menu.findItem(R.id.action_next)
+                .setIcon(new IconDrawable(this, FontAwesomeIcons.fa_check).colorRes(R.color.colorAccent).actionBarSize())
+                .setOnMenuItemClickListener(item -> {
+                    startActivity(new Intent(getApplicationContext(), ResultActivity.class));
+                    this.finish();
+                    return true;
+                });
+
+
+        return true;
     }
 
     @Override
@@ -69,6 +108,11 @@ public class PreviewActivity extends AppCompatActivity {
 
         return BitmapFactory.decodeFile(file.getAbsolutePath(), bmOptions);
         //bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true); //for changing sz
+    }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

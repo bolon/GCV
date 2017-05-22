@@ -1,8 +1,10 @@
 package com.rere.fish.gcv.modules;
 
+import com.rere.fish.gcv.result.ResponseEngineModel;
+
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 /**
@@ -10,6 +12,6 @@ import retrofit2.http.POST;
  */
 
 public interface SelfServiceInterface {
-    @POST("generateImg")
-    Call<Object> generateImg(@Header("Authorization") String key, @Body Object body);
+    @POST("label")
+    Call<ResponseEngineModel> getLabel(@Body RequestBody requestBody);
 }

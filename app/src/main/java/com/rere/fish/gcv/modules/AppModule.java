@@ -6,6 +6,8 @@ package com.rere.fish.gcv.modules;
 
 import com.rere.fish.gcv.App;
 import com.rere.fish.gcv.MainActivity;
+import com.rere.fish.gcv.PreviewActivity;
+import com.rere.fish.gcv.result.ResultActivity;
 
 import dagger.Module;
 
@@ -15,7 +17,9 @@ import dagger.Module;
         },
         library = true,
         injects = {
-                MainActivity.class
+                MainActivity.class,
+                PreviewActivity.class,
+                ResultActivity.class
         }
 )
 public class AppModule {
