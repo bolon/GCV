@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.flurgle.camerakit.CameraKit;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
 import com.karumi.dexter.Dexter;
@@ -190,6 +191,7 @@ public class CaptureImageFragment extends Fragment {
 
     @OnClick(R.id.buttonCapture)
     public void onClickCaptureButton() {
+        cameraView.setZoom(CameraKit.Constants.ZOOM_PINCH);
         cameraView.setCameraListener(new CameraListener() {
             @Override
             public void onPictureTaken(byte[] picture) {

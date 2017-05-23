@@ -5,10 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.media.ExifInterface;
 
 import com.rere.fish.gcv.PreviewActivity;
+import com.rere.fish.gcv.utils.FileUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,16 +39,14 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
     }
 
     class StoreFile extends AsyncTask<Bitmap, Void, Void> {
-        final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory().toString();
-        final String EXTERNAL_STORAGE_APP = EXTERNAL_STORAGE_PATH + File.separator + context.getPackageName() + File.separator + "Snapper/";
         String finalPath;
 
         @Override
         protected Void doInBackground(Bitmap... bmp) {
-            finalPath = EXTERNAL_STORAGE_APP + generateRandomString();
+            finalPath = FileUtil.getAppStorage(context) + generateRandomString();
             Timber.i("External storage path" + finalPath);
 
-            File f = new File(EXTERNAL_STORAGE_APP);
+            File f = new File(FileUtil.getAppStorage(context));
             if (!f.exists()) {
                 f.mkdirs();
             }

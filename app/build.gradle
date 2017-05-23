@@ -30,10 +30,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+        it.buildConfigField "String", "API_KEY_GCV", getMyApiKey("gcv_api_key")
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8 //lambda ftw
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+    }
+}
+
+
+def getMyApiKey(String property) {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("$projectDir/key"))
+
+    System.out.println(properties.getProperty(property));
+
+    return "\"" + properties.getProperty(property) + "\""
 }
 
 def supportLibraryVersion = '25.3.1'
@@ -47,6 +63,8 @@ def butterKnifeVersion = '8.5.1'
 
 def cameraKitVersion = '0.9.17'
 def permissionKarumiVersion = '4.1.0'
+
+def googleApiClientVersion = '1.22.0'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -83,11 +101,12 @@ dependencies {
     //compile "com.flurgle:camerakit:$cameraKitVersion"
     compile "com.flurgle:camerakit:${rootProject.ext.cameraKitVersion}"
 
-    // https://mvnrepository.com/artifact/com.google.apis/google-api-services-vision
-    compile('com.google.apis:google-api-services-vision:v1-rev2-1.21.0') {
+    compile('com.google.apis:google-api-services-vision:v1-rev356-1.22.0') {
         exclude group: 'org.apache.httpcomponents'  //avoid conflict with android http version
         exclude group: 'com.google.code.findbugs'
     }
+    compile "com.google.api-client:google-api-client-android:$googleApiClientVersion" exclude module: 'httpclient'
+    compile "com.google.http-client:google-http-client-gson:$googleApiClientVersion" exclude module: 'httpclient'
 
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'

@@ -24,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class APIModule {
     public static final String ENDPOINT_BUKALAPAK = "https://api.bukalapak.com/v2/";
     public static final String ENDPOINT_OWNAPI = "http://192.168.2.59:8000/";
-    public static final String ENDPOINT_GCV = "https://www.jtenaaaaun.com/tenunapi/";
+    public static final String ENDPOINT_GCV = "https://vision.googleapis.com/v1/images:annotate/";
     public static final String ACCESS_TOKEN_TEMP = "Jt3nuN_20161130";
 
     @Singleton
@@ -73,7 +73,7 @@ public class APIModule {
     @Singleton
     @Provides
     GCVInterface provideGCVService(Retrofit.Builder retrofitBuilder) {
-        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_OWNAPI)
+        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_GCV)
                 .build();
 
         return retrofitInstance.create(GCVInterface.class);

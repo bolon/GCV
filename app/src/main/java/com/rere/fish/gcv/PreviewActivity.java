@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,8 @@ import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.ResultActivity;
-import com.theartofdev.edmodo.cropper.CropImage;
+import com.rere.fish.gcv.utils.FileUtil;
+import com.rere.fish.gcv.utils.ImageUtil;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public class PreviewActivity extends AppCompatActivity {
     private static String FILE_NAME = "vader3.png";
@@ -80,7 +81,8 @@ public class PreviewActivity extends AppCompatActivity {
         menu.findItem(R.id.action_next)
                 .setIcon(new IconDrawable(this, FontAwesomeIcons.fa_check).colorRes(R.color.colorAccent).actionBarSize())
                 .setOnMenuItemClickListener(item -> {
-                    startActivity(new Intent(getApplicationContext(), ResultActivity.class));
+                    String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(), cropImageView.getCroppedImage(), getFileName());
+                    startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
                     this.finish();
                     return true;
                 });
@@ -89,16 +91,8 @@ public class PreviewActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-            }
-        }
+    public String getFileName() {
+        return pathToFile.split("/")[pathToFile.split("/").length - 1];
     }
 
     private Bitmap getImageBitmapFromStorage(String pathToFile) {
