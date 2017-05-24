@@ -15,7 +15,6 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.ResultActivity;
 import com.rere.fish.gcv.utils.FileUtil;
-import com.rere.fish.gcv.utils.ImageUtil;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -26,15 +25,12 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class PreviewActivity extends AppCompatActivity {
     private static String FILE_NAME = "vader3.png";
     private static String EXTRA_INTENT_IMAGE = "EXTRA_IMAGE";
-    @BindView(R.id.toolbarPreviewActivity)
-    Toolbar toolbar;
-    @Inject
-    SelfServiceInterface selfServiceInterface;
+    @BindView(R.id.toolbarPreviewActivity) Toolbar toolbar;
+    @Inject SelfServiceInterface selfServiceInterface;
     private CropImageView cropImageView;
     private String pathToFile;
 
@@ -78,14 +74,12 @@ public class PreviewActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.navigation_preview, menu);
 
-        menu.findItem(R.id.action_next)
-                .setIcon(new IconDrawable(this, FontAwesomeIcons.fa_check).colorRes(R.color.colorAccent).actionBarSize())
-                .setOnMenuItemClickListener(item -> {
-                    String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(), cropImageView.getCroppedImage(), getFileName());
-                    startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
-                    this.finish();
-                    return true;
-                });
+        menu.findItem(R.id.action_next).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_check).colorRes(R.color.colorAccent).actionBarSize()).setOnMenuItemClickListener(item -> {
+            String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(), cropImageView.getCroppedImage(), getFileName());
+            startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
+            this.finish();
+            return true;
+        });
 
 
         return true;

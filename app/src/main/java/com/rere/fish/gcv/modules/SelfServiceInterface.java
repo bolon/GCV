@@ -1,6 +1,6 @@
 package com.rere.fish.gcv.modules;
 
-import com.rere.fish.gcv.result.ResponseEngineModel;
+import com.rere.fish.gcv.result.preexec.ResponseEngine;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -13,5 +13,5 @@ import retrofit2.http.POST;
 
 public interface SelfServiceInterface {
     @POST("label")
-    Call<ResponseEngineModel> getLabel(@Body RequestBody requestBody);
+    Call<ResponseEngine> getLabel(@Body RequestBody requestBody);
 }

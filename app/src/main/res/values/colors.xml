@@ -12,6 +12,7 @@
 
     <color name="colorTextPrimary">#eceff1</color>
     <color name="colorTextSecondary">#e1f5fe</color>
+    <color name="colorTextDark">#23231d</color>
 
     <color name="colorAccent">#dddce7</color>
 

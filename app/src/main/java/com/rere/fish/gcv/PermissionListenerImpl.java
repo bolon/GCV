@@ -6,18 +6,17 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 /**
  * Created by Android dev on 5/13/17.
  */
 
-public class PermissionListenerImpl implements PermissionListener{
+public class PermissionListenerImpl implements PermissionListener {
     Context context;
 
 
-    public PermissionListenerImpl (Context context) {
+    public PermissionListenerImpl(Context context) {
         this.context = context;
     }
 

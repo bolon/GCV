@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,8 +21,7 @@ public class FileUtil {
 
         try {
             File tempDir = new File(tempPath);
-            if (!tempDir.exists())
-                tempDir.mkdirs();
+            if (!tempDir.exists()) tempDir.mkdirs();
 
             File tempFile = File.createTempFile("cropped" + originalName, null, tempDir);
             FileOutputStream out = new FileOutputStream(tempFile);
@@ -63,8 +61,7 @@ public class FileUtil {
     }
 
 
-    private static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -77,8 +74,7 @@ public class FileUtil {
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2;
             }
         }

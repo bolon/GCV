@@ -2,6 +2,7 @@ package com.rere.fish.gcv.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rere.fish.gcv.BuildConfig;
 
 import javax.inject.Singleton;
 
@@ -16,23 +17,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by Android dev on 5/11/17.
  */
-@Module(
-        complete = false,
-        library = true
-)
+@Module(complete = false, library = true)
 
 public class APIModule {
     public static final String ENDPOINT_BUKALAPAK = "https://api.bukalapak.com/v2/";
-    public static final String ENDPOINT_OWNAPI = "http://192.168.2.59:8000/";
+    public static final String ENDPOINT_ENGINE = BuildConfig.ENGINE_HOST_URL;
     public static final String ENDPOINT_GCV = "https://vision.googleapis.com/v1/images:annotate/";
-    public static final String ACCESS_TOKEN_TEMP = "Jt3nuN_20161130";
 
     @Singleton
     @Provides
     Retrofit.Builder provideRetrofit(Call.Factory callFactory, Gson gson) {
-        return new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .callFactory(callFactory);
+        return new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create(gson)).callFactory(callFactory);
     }
 
     @Singleton
@@ -42,7 +37,7 @@ public class APIModule {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient().newBuilder()
-                .addInterceptor(loggingInterceptor)
+                //.addInterceptor(loggingInterceptor) //for logging purpose
                 .build();
     }
 
@@ -55,8 +50,7 @@ public class APIModule {
     @Singleton
     @Provides
     BukalapakInterface provideBukalapakService(Retrofit.Builder retrofitBuilder) {
-        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_BUKALAPAK)
-                .build();
+        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_BUKALAPAK).build();
 
         return retrofitInstance.create(BukalapakInterface.class);
     }
@@ -64,8 +58,7 @@ public class APIModule {
     @Singleton
     @Provides
     SelfServiceInterface provideSelfService(Retrofit.Builder retrofitBuilder) {
-        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_OWNAPI)
-                .build();
+        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_ENGINE).build();
 
         return retrofitInstance.create(SelfServiceInterface.class);
     }
@@ -73,8 +66,7 @@ public class APIModule {
     @Singleton
     @Provides
     GCVInterface provideGCVService(Retrofit.Builder retrofitBuilder) {
-        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_GCV)
-                .build();
+        Retrofit retrofitInstance = retrofitBuilder.baseUrl(ENDPOINT_GCV).build();
 
         return retrofitInstance.create(GCVInterface.class);
     }

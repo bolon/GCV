@@ -31,7 +31,8 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField "String", "API_KEY_GCV", getMyApiKey("gcv_api_key")
+        it.buildConfigField "String", "API_KEY_GCV", getPropertyFromPrivateFile("gcv_api_key")
+        it.buildConfigField "String", "ENGINE_HOST_URL", getPropertyFromPrivateFile("engine_address")
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8 //lambda ftw
@@ -43,7 +44,7 @@ android {
 }
 
 
-def getMyApiKey(String property) {
+def getPropertyFromPrivateFile(String property) {
     Properties properties = new Properties()
     properties.load(new FileInputStream("$projectDir/key"))
 
@@ -97,9 +98,7 @@ dependencies {
 
     compile "com.karumi:dexter:$permissionKarumiVersion"
 
-    //images
-    //compile "com.flurgle:camerakit:$cameraKitVersion"
-    compile "com.flurgle:camerakit:${rootProject.ext.cameraKitVersion}"
+    compile "com.flurgle:camerakit:$cameraKitVersion"
 
     compile('com.google.apis:google-api-services-vision:v1-rev356-1.22.0') {
         exclude group: 'org.apache.httpcomponents'  //avoid conflict with android http version
@@ -110,5 +109,9 @@ dependencies {
 
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
+
+    compile 'org.parceler:parceler-api:1.1.8'
+    annotationProcessor 'org.parceler:parceler:1.1.8'
+
     testCompile 'junit:junit:4.12'
 }

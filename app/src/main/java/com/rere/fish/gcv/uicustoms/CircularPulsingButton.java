@@ -214,10 +214,7 @@ public class CircularPulsingButton extends FrameLayout {
     }
 
     private void scaleView(View v, float startScale, float endScale) {
-        Animation anim = new ScaleAnimation(
-                startScale, endScale,
-                startScale, endScale,
-                Animation.ABSOLUTE, v.getWidth() / 2, // Pivot point of X scaling
+        Animation anim = new ScaleAnimation(startScale, endScale, startScale, endScale, Animation.ABSOLUTE, v.getWidth() / 2, // Pivot point of X scaling
                 Animation.ABSOLUTE, v.getHeight() / 2); // Pivot point of Y scaling
         anim.setFillAfter(true);
         anim.setDuration(animationDuration);

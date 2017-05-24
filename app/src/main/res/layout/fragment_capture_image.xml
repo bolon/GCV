@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.rere.fish.gcv.imagesource.CaptureImageFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <RelativeLayout
         android:id="@+id/rootCameraView"
         android:layout_width="match_parent"

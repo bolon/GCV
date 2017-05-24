@@ -5,5 +5,5 @@ package com.rere.fish.gcv.result;
  */
 
 public interface OnFinishVisionProcess {
-    void onReceivedResult(String result);
+    void onReceivedResultFromGCV(String result);
 }
