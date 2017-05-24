@@ -7,29 +7,25 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.widget.LinearLayout;
 
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.ResultActivity;
 import com.rere.fish.gcv.utils.FileUtil;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class PreviewActivity extends AppCompatActivity {
     private static String FILE_NAME = "vader3.png";
     private static String EXTRA_INTENT_IMAGE = "EXTRA_IMAGE";
-    @BindView(R.id.toolbarPreviewActivity) Toolbar toolbar;
+    @BindView(R.id.tab_layout) LinearLayout tabLayout;
     @Inject SelfServiceInterface selfServiceInterface;
     private CropImageView cropImageView;
     private String pathToFile;
@@ -40,6 +36,25 @@ public class PreviewActivity extends AppCompatActivity {
         return intent;
     }
 
+    @OnClick(R.id.text_action_cancel)
+    public void onCancelClicked() {
+        this.finish();
+    }
+
+    @OnClick(R.id.text_action_next)
+    public void onNextClicked() {
+        String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(),
+                cropImageView.getCroppedImage(), getFileName());
+        startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
+        this.finish();
+    }
+
+    @OnClick(R.id.image_action_rotate)
+    public void onRotateClicked() {
+        //TODO : STUB
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,40 +64,29 @@ public class PreviewActivity extends AppCompatActivity {
         App.get(getApplicationContext()).getInjector().inject(this);
         ButterKnife.bind(this);
 
-/*        CropImage.activity(uri)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .start(this);*/
         pathToFile = getIntent().getStringExtra(EXTRA_INTENT_IMAGE);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        toolbar.setNavigationIcon(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
-        toolbar.setNavigationIcon(new IconDrawable(this, FontAwesomeIcons.fa_close).colorRes(R.color.colorAccent).actionBarSize());
-
-        try {
-            InputStream is = getApplicationContext().getAssets().open(FILE_NAME);
-            cropImageView.setImageBitmap(getImageBitmapFromStorage(pathToFile));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.navigation_preview, menu);
-
-        menu.findItem(R.id.action_next).setIcon(new IconDrawable(this, FontAwesomeIcons.fa_check).colorRes(R.color.colorAccent).actionBarSize()).setOnMenuItemClickListener(item -> {
-            String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(), cropImageView.getCroppedImage(), getFileName());
-            startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
-            this.finish();
-            return true;
-        });
-
-
-        return true;
+        cropImageView.setImageBitmap(getImageBitmapFromStorage(pathToFile));
+/*
+        bottomNavigationView.setSelectedItemId(R.id.navigation_rotate);
+        bottomNavigationView.clearAnimation();
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.navigation_cancel:
+                    break;
+                case R.id.navigation_rotate:
+                    Timber.i("is_rotate");
+                    break;
+                case R.id.navigation_next:
+                    String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(),
+                            cropImageView.getCroppedImage(), getFileName());
+                    startActivity(
+                            ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
+                    this.finish();
+                    break;
+            }
+            return false;
+        });*/
     }
 
     public String getFileName() {

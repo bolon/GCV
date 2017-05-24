@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_cancel"
+        android:title="@string/action_bot_cancel" />
+
+    <item
+        android:id="@+id/navigation_rotate"
+        android:icon="@drawable/ic_rotate_90_degrees_ccw_white_24dp" />
+
+    <item
+        android:id="@+id/navigation_next"
+        android:title="@string/action_bot_done" />
+
+</menu>

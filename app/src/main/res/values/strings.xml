@@ -4,6 +4,12 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!--preview-->
+    <string name="action_bot_cancel">CANCEL</string>
+    <string name="action_bot_rotate">ROTATE</string>
+    <string name="action_bot_done">DONE</string>
+
+
     <string name="hello_blank_fragment">Hello dashboard frag</string>
     <string name="hello_blank_fragment_gar">Hello notif frag</string>
 

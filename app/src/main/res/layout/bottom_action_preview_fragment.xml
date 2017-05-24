@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tab_layout"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:layout_gravity="bottom"
+    android:background="@android:color/black">
+
+    <TextView
+        android:id="@+id/text_action_cancel"
+        style="@style/bottom_action_preview_style"
+        android:text="@string/action_bot_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:id="@+id/image_action_rotate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scaleType="center"
+        app:srcCompat="@drawable/ic_rotate_90_degrees_ccw_white_24dp" />
+
+    <TextView
+        android:id="@+id/text_action_next"
+        style="@style/bottom_action_preview_style"
+        android:text="@string/action_bot_done"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+</LinearLayout>

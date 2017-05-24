@@ -70,9 +70,16 @@ public class CaptureImageFragment extends Fragment {
     public void onClickButtonPermission() {
         Timber.i("checkpermission", checkPermission());
         if (!checkPermission()) {
-            Dexter.withActivity(getActivity()).withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE).withListener(new CompositeMultiplePermissionsListener(multiplePermissionsListener, SnackbarOnAnyDeniedMultiplePermissionsListener.Builder.with(parentLayout, R.string.all_permissions_denied_feedback)
-                    //.withOpenSettingsButton("Settings") //TODO : Handle this
-                    .build())).withErrorListener(error -> Timber.e("Error request permission " + error.toString())).check();
+            Dexter.withActivity(getActivity()).withPermissions(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE).withListener(
+                    new CompositeMultiplePermissionsListener(multiplePermissionsListener,
+                            SnackbarOnAnyDeniedMultiplePermissionsListener.Builder.with(
+                                    parentLayout, R.string.all_permissions_denied_feedback)
+                                    //.withOpenSettingsButton("Settings") //TODO : Handle this
+                                    .build())).withErrorListener(
+                    error -> Timber.e("Error request permission " + error.toString())).check();
         } else {
             rePermissionLayout.setVisibility(GONE);
         }
@@ -99,7 +106,8 @@ public class CaptureImageFragment extends Fragment {
 
             @Override
             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                Snackbar.make(parentLayout, "Please manually allow permission(s) from settings", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(parentLayout, "Please manually allow permission(s) from settings",
+                        Snackbar.LENGTH_SHORT).show();
                 token.cancelPermissionRequest();
 
             }
@@ -114,7 +122,8 @@ public class CaptureImageFragment extends Fragment {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             btnCapture.setColor(getContext().getColor(R.color.alphaGray80));
-            btnCapture.setDrawable(getResources().getDrawable(R.mipmap.icon_camera, getActivity().getTheme()));
+            btnCapture.setDrawable(
+                    getResources().getDrawable(R.mipmap.icon_camera, getActivity().getTheme()));
         } else {
             btnCapture.setColor(getResources().getColor(R.color.alphaGray80));
             btnCapture.setDrawable(getResources().getDrawable(R.mipmap.icon_camera));
@@ -130,9 +139,12 @@ public class CaptureImageFragment extends Fragment {
     }
 
     private boolean checkPermission() {
-        int resultCamera = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
-        int resultMedia1 = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int resultMedia2 = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int resultCamera = ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.CAMERA);
+        int resultMedia1 = ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int resultMedia2 = ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE);
 
         if (resultCamera == PackageManager.PERMISSION_GRANTED & resultMedia1 == PackageManager.PERMISSION_GRANTED & resultMedia2 == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -147,7 +159,8 @@ public class CaptureImageFragment extends Fragment {
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnLoadingFragmentInteractionListener");
+            throw new RuntimeException(
+                    context.toString() + " must implement OnLoadingFragmentInteractionListener");
         }
     }
 
