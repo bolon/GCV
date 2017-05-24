@@ -52,3 +52,6 @@ google-services.json
 
 #Key
 key
+
+#DSStore
+.DS_Store
