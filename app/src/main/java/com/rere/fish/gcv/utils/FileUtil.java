@@ -8,6 +8,8 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
  * Created by Android dev on 5/23/17.
@@ -93,5 +95,9 @@ public class FileUtil {
         for (File f : tempDir.listFiles()) {
             if (!f.isDirectory()) f.delete();
         }
+    }
+
+    public static String generateRandomString() {
+        return new BigInteger(80, new SecureRandom()).toString(32) + ".png";
     }
 }

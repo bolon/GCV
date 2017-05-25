@@ -43,7 +43,7 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
 
         @Override
         protected Void doInBackground(Bitmap... bmp) {
-            finalPath = FileUtil.getAppStorage(context) + generateRandomString();
+            finalPath = FileUtil.getAppStorage(context) + FileUtil.generateRandomString();
             Timber.i("External storage path" + finalPath);
 
             File f = new File(FileUtil.getAppStorage(context));
@@ -89,10 +89,6 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
 
         void scanImageToGallery(String path) {
             MediaScannerConnection.scanFile(context, new String[]{path}, new String[]{"image/jpeg"}, null);
-        }
-
-        String generateRandomString() {
-            return new BigInteger(80, new SecureRandom()).toString(32) + ".png";
         }
 
         int getRotationImage(String path) {

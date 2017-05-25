@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.LinearLayout;
@@ -32,6 +33,8 @@ public class PreviewActivity extends AppCompatActivity {
 
     public static Intent createIntent(Context context, String pathToImage) {
         Intent intent = new Intent(context, PreviewActivity.class);
+        intent.setType(EXTRA_INTENT_IMAGE);
+        intent.setAction(EXTRA_INTENT_IMAGE);
         intent.putExtra(EXTRA_INTENT_IMAGE, pathToImage);
         return intent;
     }
@@ -44,7 +47,7 @@ public class PreviewActivity extends AppCompatActivity {
     @OnClick(R.id.text_action_next)
     public void onNextClicked() {
         String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(),
-                cropImageView.getCroppedImage(), getFileName());
+                cropImageView.getCroppedImage(), FileUtil.generateRandomString());
         startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
         this.finish();
     }
@@ -64,33 +67,32 @@ public class PreviewActivity extends AppCompatActivity {
         App.get(getApplicationContext()).getInjector().inject(this);
         ButterKnife.bind(this);
 
-        pathToFile = getIntent().getStringExtra(EXTRA_INTENT_IMAGE);
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
 
-        cropImageView.setImageBitmap(getImageBitmapFromStorage(pathToFile));
-/*
-        bottomNavigationView.setSelectedItemId(R.id.navigation_rotate);
-        bottomNavigationView.clearAnimation();
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.navigation_cancel:
-                    break;
-                case R.id.navigation_rotate:
-                    Timber.i("is_rotate");
-                    break;
-                case R.id.navigation_next:
-                    String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(),
-                            cropImageView.getCroppedImage(), getFileName());
-                    startActivity(
-                            ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
-                    this.finish();
-                    break;
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                handleSendImage(intent);
             }
-            return false;
-        });*/
+        } else {
+            if (type.equals(EXTRA_INTENT_IMAGE)) {
+                handleCapturedImage(intent);
+            }
+        }
     }
 
-    public String getFileName() {
-        return pathToFile.split("/")[pathToFile.split("/").length - 1];
+    private void handleCapturedImage(Intent intent) {
+        pathToFile = intent.getStringExtra(EXTRA_INTENT_IMAGE);
+        cropImageView.setImageBitmap(getImageBitmapFromStorage(pathToFile));
+    }
+
+    void handleSendImage(Intent intent) {
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            cropImageView.setImageUriAsync(imageUri);
+            // Update UI to reflect image being shared
+        }
     }
 
     private Bitmap getImageBitmapFromStorage(String pathToFile) {
