@@ -74,7 +74,7 @@ public class ProductFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
             }
-            recyclerView.setAdapter(new ProductRecyclerViewAdapter(responseBL.getProducts(), mListener));
+            recyclerView.setAdapter(new ProductAdapter(responseBL.getProducts(), mListener));
         } else {
             //todo : if response empty show smthing (maybe lottie animation)
         }

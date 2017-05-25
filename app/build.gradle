@@ -67,6 +67,9 @@ def permissionKarumiVersion = '4.1.0'
 
 def googleApiClientVersion = '1.22.0'
 
+def glideVersion = '4.0.0-RC0'
+def parcelerVersion = '1.1.8'
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -107,11 +110,12 @@ dependencies {
     compile "com.google.api-client:google-api-client-android:$googleApiClientVersion" exclude module: 'httpclient'
     compile "com.google.http-client:google-http-client-gson:$googleApiClientVersion" exclude module: 'httpclient'
 
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
 
-    compile 'org.parceler:parceler-api:1.1.8'
-    annotationProcessor 'org.parceler:parceler:1.1.8'
+    compile "org.parceler:parceler-api:$parcelerVersion"
+    annotationProcessor "org.parceler:parceler:$parcelerVersion"
+
+    compile "com.github.bumptech.glide:glide:$glideVersion"
 
     testCompile 'junit:junit:4.12'
 }

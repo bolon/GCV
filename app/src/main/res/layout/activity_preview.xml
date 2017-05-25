@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="?attr/actionBarSize"
-        android:background="@color/alphaGray60"
         app:cropBackgroundColor="@color/alphaGray80"
         app:cropBorderCornerColor="@android:color/darker_gray"
         app:cropBorderCornerOffset="0dp"

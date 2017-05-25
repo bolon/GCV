@@ -84,7 +84,7 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
 
     @Override
     public void onPreProcessInteraction(ResponseBL responseBL) {
-        Fragment f2 = ProductFragment.newInstance(1, responseBL);
+        Fragment f2 = ProductFragment.newInstance(2, responseBL);
         listFragment.add(f2);
 
         ft = fragmentManager.beginTransaction();
