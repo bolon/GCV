@@ -70,7 +70,7 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
                 matrix.setRotate(90, (float) bmp.getWidth() / 2, (float) bmp.getHeight() / 2);
 
                 bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
-                bmp.compress(Bitmap.CompressFormat.JPEG, 80, out); // bmp is your Bitmap instance
+                bmp.compress(Bitmap.CompressFormat.JPEG, 90, out); // bmp is your Bitmap instance
 
                 scanImageToGallery(path);
             } catch (Exception e) {

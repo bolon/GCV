@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.flurgle.camerakit.CameraKit;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
 import com.karumi.dexter.Dexter;
@@ -120,6 +119,7 @@ public class CaptureImageFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_capture_image, container, false);
         ButterKnife.bind(this, v);
 
+        btnCapture.setClickable(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             btnCapture.setColor(getContext().getColor(R.color.alphaGray80));
             btnCapture.setDrawable(
@@ -135,7 +135,22 @@ public class CaptureImageFragment extends Fragment {
             rePermissionLayout.setVisibility(View.VISIBLE);
         }
 
+        setConfigCamera();
         return v;
+    }
+
+    private void setConfigCamera() {
+        cameraView.setJpegQuality(70);
+        cameraView.setCameraListener(new CameraListener() {
+            @Override
+            public void onPictureTaken(byte[] picture) {
+                super.onPictureTaken(picture);
+
+                Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+
+                additionalCameraTask.onFinishCamera(result);
+            }
+        });
     }
 
     private boolean checkPermission() {
@@ -166,18 +181,7 @@ public class CaptureImageFragment extends Fragment {
 
     @OnClick(R.id.buttonCapture)
     public void onClickCaptureButton() {
-        cameraView.setZoom(CameraKit.Constants.ZOOM_PINCH);
-        cameraView.setCameraListener(new CameraListener() {
-            @Override
-            public void onPictureTaken(byte[] picture) {
-                super.onPictureTaken(picture);
-
-                Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-
-                additionalCameraTask.onFinishCamera(result);
-            }
-        });
-
+        btnCapture.setVisibility(GONE);
         cameraView.captureImage();
     }
 
@@ -191,6 +195,7 @@ public class CaptureImageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        btnCapture.setVisibility(View.VISIBLE);
         if (checkPermission()) {
             cameraView.start();
         }
