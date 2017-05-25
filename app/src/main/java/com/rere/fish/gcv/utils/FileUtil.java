@@ -17,7 +17,7 @@ public class FileUtil {
     public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory().toString();
 
     public static String saveCroppedImage(Context context, Bitmap bmp, String originalName) {
-        String tempPath = getAppStorage(context) + File.separator + "temp" + File.separator;
+        String tempPath = getAppCacheStorage(context) + File.separator + "temp" + File.separator;
 
         try {
             File tempDir = new File(tempPath);
@@ -26,7 +26,7 @@ public class FileUtil {
             File tempFile = File.createTempFile("cropped" + originalName, null, tempDir);
             FileOutputStream out = new FileOutputStream(tempFile);
 
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
 
             return tempFile.getAbsolutePath();
         } catch (IOException e) {
@@ -37,6 +37,10 @@ public class FileUtil {
 
     public static String getAppStorage(Context context) {
         return EXTERNAL_STORAGE_PATH + File.separator + context.getPackageName() + File.separator + "Snapper/";
+    }
+
+    public static String getAppCacheStorage(Context context) {
+        return context.getExternalCacheDir().getPath() + File.separator + context.getPackageName() + File.separator;
     }
 
     public static Bitmap getBitmapFromStorage(String path) {
@@ -60,7 +64,6 @@ public class FileUtil {
         return BitmapFactory.decodeFile(path, options);
     }
 
-
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -80,5 +83,15 @@ public class FileUtil {
         }
 
         return inSampleSize;
+    }
+
+    public static void cleanTempFile(Context context) {
+        String tempPath = getAppCacheStorage(context) + File.separator + "temp" + File.separator;
+
+        File tempDir = new File(tempPath);
+
+        for (File f : tempDir.listFiles()) {
+            if (!f.isDirectory()) f.delete();
+        }
     }
 }

@@ -18,6 +18,7 @@ import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.preexec.PreProcessFragment;
 import com.rere.fish.gcv.result.product.ProductFragment;
 import com.rere.fish.gcv.result.product.ResponseBL;
+import com.rere.fish.gcv.utils.FileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class ResultActivity extends AppCompatActivity implements ProductFragment.OnProductsFragmentInteractionListener, PreProcessFragment.OnLoadingFragmentInteractionListener {
     public static final String PREPROCESS = "LOADING_FRAG";
@@ -92,11 +92,11 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
         ft.commit();
 
         resurfaceFragment(PRODUCTS);
+        FileUtil.cleanTempFile(getApplicationContext());
     }
 
     @Override
     public void onProductsInteraction(String url) {
-        Timber.i("item_clicked " + url);
         Intent newIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(newIntent);
     }
