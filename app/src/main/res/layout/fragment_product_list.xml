@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:name="com.rere.fish.gcv.result.ProductFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.rere.fish.gcv.result.product.ProductFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.rere.fish.gcv.result.product.ProductFragment">
 
-    <android.support.v7.widget.Toolbar
-        android:background="@color/colorPrimary"
-        android:id="@+id/toolbarListProduct"
-        android:title="List"
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/chipContainer"
+        android:padding="4dp"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="@dimen/chip_height"
+        android:background="@color/colorSecondaryLightAlpha80"
+        android:layout_marginBottom="2dp">
 
-    </android.support.v7.widget.Toolbar>
+    </com.google.android.flexbox.FlexboxLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/fragment_product" />
+        tools:listitem="@layout/fragment_product"/>
 
 
 </LinearLayout>

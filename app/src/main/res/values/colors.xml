@@ -6,9 +6,13 @@
     <color name="colorPrimaryDark">#6e1437</color>
     <color name="colorPrimaryLight">#a35174</color>
 
+    <color name="colorPrimaryAlpha60">#99813a52</color>
+
     <color name="colorSecondary">#78909c</color>
     <color name="colorSecondaryDark">#4b636e</color>
     <color name="colorSecondaryLight">#a7c0cd</color>
+
+    <color name="colorSecondaryLightAlpha80">#61a7c0cd</color>
 
     <color name="colorTextPrimary">#eceff1</color>
     <color name="colorTextSecondary">#e1f5fe</color>

@@ -1,23 +1,26 @@
 package com.rere.fish.gcv.result.product;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.flexbox.FlexboxLayout;
 import com.rere.fish.gcv.R;
 
 import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fisk.chipcloud.ChipCloud;
+import fisk.chipcloud.ChipCloudConfig;
 
 /**
  * A fragment representing a list of Items.
@@ -30,7 +33,7 @@ public class ProductFragment extends Fragment {
     private static final String ARG_PRODUCTS = "products";
 
     @BindView(R.id.list) RecyclerView recyclerView;
-    @BindView(R.id.toolbarListProduct) Toolbar toolbar;
+    @BindView(R.id.chipContainer) FlexboxLayout chipContainer;
     private int mColumnCount = 2;
     private ResponseBL responseBL;
     private OnProductsFragmentInteractionListener mListener;
@@ -79,6 +82,17 @@ public class ProductFragment extends Fragment {
             //todo : if response empty show smthing (maybe lottie animation)
         }
 
+        ChipCloudConfig config = new ChipCloudConfig().selectMode(
+                ChipCloud.SelectMode.multi).checkedChipColor(
+                getContext().getResources().getColor(R.color.colorPrimaryLight)).checkedTextColor(
+                getContext().getResources().getColor(R.color.colorTextPrimary)).uncheckedChipColor(
+                Color.parseColor("#efefef")).uncheckedTextColor(
+                Color.parseColor("#666666")).useInsetPadding(true);
+
+        ChipCloud chipCloud = new ChipCloud(getActivity(), chipContainer, config);
+        chipCloud.addChip("test1");
+        chipCloud.addChip("test2");
+
         return view;
     }
 
@@ -89,7 +103,8 @@ public class ProductFragment extends Fragment {
         if (context instanceof OnProductsFragmentInteractionListener) {
             mListener = (OnProductsFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnProductsFragmentInteractionListener");
+            throw new RuntimeException(
+                    context.toString() + " must implement OnProductsFragmentInteractionListener");
         }
     }
 

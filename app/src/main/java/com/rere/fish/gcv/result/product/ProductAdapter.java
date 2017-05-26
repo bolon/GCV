@@ -13,10 +13,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.rere.fish.gcv.R;
 import com.rere.fish.gcv.result.product.ProductFragment.OnProductsFragmentInteractionListener;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 /**
  * And dev
@@ -45,9 +48,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Glide.with(holder.cardView).load(holder.product.images.get(0)).apply(
                 new RequestOptions().centerCrop()).into(holder.thumbProduct);
 
-        holder.idProduct.setText(products.get(position).id);
         holder.contentProduct.setText(products.get(position).name);
 
+        String formattedPrice = (NumberFormat.getCurrencyInstance(new Locale("id", "ID")).format(
+                holder.product.price));
+        holder.priceProduct.setText(formattedPrice);
         holder.cardView.setOnClickListener(v -> {
             if (null != mListener) {
                 // Notify the active callbacks interface (the activity, if the
@@ -66,8 +71,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         ResponseBL.Product product;
         @BindView(R.id.text_content_product) TextView contentProduct;
         @BindView(R.id.containerViewProduct) CardView cardView;
-        @BindView(R.id.text_id_product) TextView idProduct;
         @BindView(R.id.thumb_product) ImageView thumbProduct;
+        @BindView(R.id.text_price_product) TextView priceProduct;
 
         public ProductViewHolder(View view) {
             super(view);
