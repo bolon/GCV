@@ -88,6 +88,7 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
 
     @Override
     public void onReceivedKeywords(String keywords) {
+        Timber.i("keyword_here " + keywords);
         finalKeywords = keywords;
         callBukalapakService(finalKeywords, INITIAL_PAGE, NUMBER_PER_FETCH, Collections.EMPTY_LIST);
     }

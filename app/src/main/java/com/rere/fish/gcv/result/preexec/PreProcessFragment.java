@@ -167,8 +167,11 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     }
 
     private void callEngineService(String responseGCV) {
+        //        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
+        //                loadJSONFromAsset());
+
         RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
-                loadJSONFromAsset());
+                responseGCV);
 
         engineServices.getLabel(requestRaw).enqueue(new Callback<ResponseEngine>() {
             @Override
@@ -320,12 +323,12 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     @Override
     public void onReceivedResultFromGCV(String result) {
         Timber.i("Calling from GCV is done...");
-        updateLayout(false, "<blink>Filter the result</blink>");
+        updateLayout(false, "Filter the result");
         callEngineService(result);
     }
 
     private void updateLayout(boolean isFinish, String text) {
-        if (text.equals("")) textView.setText(Html.fromHtml("<b>Done</b>"));
+        if (text.equals("")) textView.setText(Html.fromHtml("Done"));
         else textView.setText(Html.fromHtml(text));
 
         if (isFinish) {
@@ -345,8 +348,15 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
         if (eventListener != null) {
             //TODO : Uncomment later to set keywords after filtering from engine
-            //eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
-            eventListener.onReceivedKeywords(tempKeyWords);
+
+            try {
+                if (!resp.listResponsePair.isEmpty())
+                    eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
+            } catch (NullPointerException ex) {
+                Timber.e("Response from engine null, using gcv result instead");
+                eventListener.onReceivedKeywords(tempKeyWords);
+
+            }
         }
     }
 
