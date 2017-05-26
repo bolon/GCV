@@ -27,15 +27,15 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.api.services.vision.v1.model.WebDetection;
+import com.google.api.services.vision.v1.model.WebEntity;
 import com.rere.fish.gcv.App;
 import com.rere.fish.gcv.BuildConfig;
 import com.rere.fish.gcv.R;
 import com.rere.fish.gcv.modules.BukalapakInterface;
 import com.rere.fish.gcv.modules.SelfServiceInterface;
-import com.rere.fish.gcv.result.OnFinishBLProcess;
 import com.rere.fish.gcv.result.OnFinishEngineProcess;
 import com.rere.fish.gcv.result.OnFinishVisionProcess;
-import com.rere.fish.gcv.result.product.ResponseBL;
 import com.rere.fish.gcv.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -59,10 +59,12 @@ import timber.log.Timber;
 /**
  * And dev
  */
-public class PreProcessFragment extends Fragment implements OnFinishVisionProcess, OnFinishEngineProcess, OnFinishBLProcess {
+public class PreProcessFragment extends Fragment implements OnFinishVisionProcess, OnFinishEngineProcess {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    String tempKeyWords = "";
 
     @BindView(R.id.rootFragmentView) FrameLayout rootView;
     @BindView(R.id.textAck) TextView textView;
@@ -76,7 +78,7 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     private String mParam2;
 
     private View v;
-    private OnLoadingFragmentInteractionListener mListener;
+    private OnLoadingFragmentInteractionListener eventListener;
 
     public PreProcessFragment() {
         // Required empty public constructor
@@ -117,7 +119,9 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         updateLayout(false, "<blink>Processing your image</blink>");
         animationView.setAnimation("cube_loader.json");
         animationView.loop(true);
-        animationView.addColorFilterToLayer("bg", new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.DARKEN));
+        animationView.addColorFilterToLayer("bg",
+                new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
+                        PorterDuff.Mode.DARKEN));
         animationView.playAnimation();
 
         return v;
@@ -132,14 +136,18 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
                 try {
 
-                    VisionRequestInitializer visionRequestInitializer = new VisionRequestInitializer(BuildConfig.API_KEY_GCV);
-                    Vision.Builder visionBuilder = new Vision.Builder(httpTransport, jsonFactory, null);
+                    VisionRequestInitializer visionRequestInitializer = new VisionRequestInitializer(
+                            BuildConfig.API_KEY_GCV);
+                    Vision.Builder visionBuilder = new Vision.Builder(httpTransport, jsonFactory,
+                            null);
                     visionBuilder.setVisionRequestInitializer(visionRequestInitializer);
 
                     Vision vision = visionBuilder.build();
 
-                    BatchAnnotateImagesRequest batchAnnotateImagesRequest = generateGCVRequest(bitmap);
-                    Vision.Images.Annotate annotateRequest = vision.images().annotate(batchAnnotateImagesRequest);
+                    BatchAnnotateImagesRequest batchAnnotateImagesRequest = generateGCVRequest(
+                            bitmap);
+                    Vision.Images.Annotate annotateRequest = vision.images().annotate(
+                            batchAnnotateImagesRequest);
                     // Due to a bug: requests to Vision API containing large images fail when GZipped.
                     annotateRequest.setDisableGZipContent(true);
                     BatchAnnotateImagesResponse response = annotateRequest.execute();
@@ -159,7 +167,8 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     }
 
     private void callEngineService(String responseGCV) {
-        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"), loadJSONFromAsset());
+        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
+                loadJSONFromAsset());
 
         engineServices.getLabel(requestRaw).enqueue(new Callback<ResponseEngine>() {
             @Override
@@ -175,22 +184,6 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         });
     }
 
-    private void callBukalapakService(List<ResponseEngine.ResponsePair> resp) {
-        bukalapakInterface.getListProducts(unifiedKeywords(resp), 1, 10).enqueue(new Callback<ResponseBL>() {
-            @Override
-            public void onResponse(Call<ResponseBL> call, Response<ResponseBL> response) {
-                if (response.isSuccessful()) onReceivedBLResult(response.body());
-                else Timber.e("Can't get products");
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBL> call, Throwable t) {
-                Timber.e("Can't get items");
-            }
-        });
-    }
-
-    //TODO : Check how to send multiple keywords to BL
     private String unifiedKeywords(List<ResponseEngine.ResponsePair> resp) {
         String keyWords = "";
 
@@ -261,9 +254,31 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         List<AnnotateImageResponse> responses = response.getResponses();
 
         for (AnnotateImageResponse a : responses) {
+            WebDetection detectionRes = a.getWebDetection();
+
+            if (!detectionRes.getWebEntities().isEmpty()) {
+                for (WebEntity e : detectionRes.getWebEntities()) {
+                    if (e.getScore() > 0.8001) {
+                        tempKeyWords += e.getDescription() + "+";
+                        if (detectionRes.getWebEntities().indexOf(e) == 1) break;
+                    }
+                }
+            } else {
+                tempKeyWords += "Ikan lele";
+            }
+
+            for (WebEntity e : detectionRes.getWebEntities()) {
+                Timber.i(
+                        "entity_get : " + e.getDescription() + " = " + e.getScore() + " --> annotate pos : " + responses.indexOf(
+                                a));
+            }
+
+            Timber.i("tempkeywords : " + tempKeyWords);
+
             /*WebDetection annotation = a.getWebDetection();
             message += ("Entity:Id:Score");
             message += ("===============");
+
             for (WebEntity entity : annotation.getWebEntities()) {
                 message += (entity.getDescription() + " : " + entity.getEntityId() + " : "
                         + entity.getScore());
@@ -289,16 +304,17 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnLoadingFragmentInteractionListener) {
-            mListener = (OnLoadingFragmentInteractionListener) context;
+            eventListener = (OnLoadingFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnLoadingFragmentInteractionListener");
+            throw new RuntimeException(
+                    context.toString() + " must implement OnLoadingFragmentInteractionListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        eventListener = null;
     }
 
     @Override
@@ -327,23 +343,15 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     public void onReceivedResultFromEngine(ResponseEngine resp) {
         Timber.i("Calling from Engine is done...");
 
-        if (!resp.listResponsePair.isEmpty()) {
-            //updateLayout(true, "");
-            callBukalapakService(resp.listResponsePair);
-        }
-    }
-
-    @Override
-    public void onReceivedBLResult(ResponseBL resp) {
-        Timber.i("Calling from BL is done...");
-
-        if (mListener != null) {
-            mListener.onPreProcessInteraction(resp);
+        if (eventListener != null) {
+            //TODO : Uncomment later to set keywords after filtering from engine
+            //eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
+            eventListener.onReceivedKeywords(tempKeyWords);
         }
     }
 
     public interface OnLoadingFragmentInteractionListener {
-        void onPreProcessInteraction(ResponseBL resp);
+        void onReceivedKeywords(String keywords);
     }
 
 }

@@ -11,11 +11,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.rere.fish.gcv.R;
+import com.rere.fish.gcv.result.ResultActivity;
 
 import org.parceler.Parcels;
+
+import java.util.Collections;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,9 +39,11 @@ public class ProductFragment extends Fragment {
 
     @BindView(R.id.list) RecyclerView recyclerView;
     @BindView(R.id.chipContainer) FlexboxLayout chipContainer;
+    @BindView(R.id.text_product_status) TextView textViewProductStatus;
     private int mColumnCount = 2;
     private ResponseBL responseBL;
-    private OnProductsFragmentInteractionListener mListener;
+    private OnProductsFragmentInteractionListener productEventListener;
+    private ProductAdapter productAdapter;
 
     public ProductFragment() {
     }
@@ -62,6 +69,7 @@ public class ProductFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             responseBL = Parcels.unwrap(getArguments().getParcelable(ARG_PRODUCTS));
         }
+
     }
 
     @Override
@@ -72,15 +80,27 @@ public class ProductFragment extends Fragment {
 
         // Set the adapter
         if (!responseBL.getProducts().isEmpty()) {
+            textViewProductStatus.setVisibility(View.GONE);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
             }
-            recyclerView.setAdapter(new ProductAdapter(responseBL.getProducts(), mListener));
+            productAdapter = new ProductAdapter(responseBL.getProducts(), productEventListener);
+            recyclerView.setAdapter(productAdapter);
         } else {
-            //todo : if response empty show smthing (maybe lottie animation)
+            textViewProductStatus.setVisibility(View.VISIBLE);
+            chipContainer.setVisibility(View.GONE);
         }
+
+        recyclerView.addOnScrollListener(
+                new InfiniteScrollListener((LinearLayoutManager) recyclerView.getLayoutManager()) {
+                    @Override
+                    public void onLoadMore(int current_page) {
+                        productEventListener.onRequestedMoreProducts(current_page,
+                                ResultActivity.NUMBER_PER_FETCH, Collections.EMPTY_LIST);
+                    }
+                });
 
         ChipCloudConfig config = new ChipCloudConfig().selectMode(
                 ChipCloud.SelectMode.multi).checkedChipColor(
@@ -101,7 +121,7 @@ public class ProductFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnProductsFragmentInteractionListener) {
-            mListener = (OnProductsFragmentInteractionListener) context;
+            productEventListener = (OnProductsFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(
                     context.toString() + " must implement OnProductsFragmentInteractionListener");
@@ -111,11 +131,17 @@ public class ProductFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        productEventListener = null;
+    }
+
+    public void doProductAddition(List<ResponseBL.Product> productList) {
+        productAdapter.addProducts(productList);
     }
 
 
     public interface OnProductsFragmentInteractionListener {
         void onProductsInteraction(String itemId);
+
+        void onRequestedMoreProducts(int page, int number, List<String> categories);
     }
 }

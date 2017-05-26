@@ -7,5 +7,5 @@ import com.rere.fish.gcv.result.product.ResponseBL;
  */
 
 public interface OnFinishBLProcess {
-    void onReceivedBLResult(ResponseBL resp);
+    void onReceivedInitialBLResult(ResponseBL resp);
 }

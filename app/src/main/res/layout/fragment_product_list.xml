@@ -11,13 +11,21 @@
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/chipContainer"
-        android:padding="4dp"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chip_height"
+        android:layout_marginBottom="2dp"
         android:background="@color/colorSecondaryLightAlpha80"
-        android:layout_marginBottom="2dp">
+        android:padding="4dp">
 
     </com.google.android.flexbox.FlexboxLayout>
+
+    <TextView
+        android:id="@+id/text_product_status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/no_item_found"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"

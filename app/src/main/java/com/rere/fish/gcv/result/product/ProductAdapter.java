@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.rere.fish.gcv.R;
 import com.rere.fish.gcv.result.product.ProductFragment.OnProductsFragmentInteractionListener;
 
@@ -19,7 +18,6 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * And dev
@@ -45,8 +43,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public void onBindViewHolder(final ProductViewHolder holder, int position) {
         holder.product = products.get(position);
 
-        Glide.with(holder.cardView).load(holder.product.images.get(0)).apply(
-                new RequestOptions().centerCrop()).into(holder.thumbProduct);
+        try {
+            Glide.with(holder.cardView.getContext()).load(holder.product.images.get(0)).placeholder(
+                    R.mipmap.img_128).centerCrop().error(R.mipmap.img_128).into(
+                    holder.thumbProduct);
+        } catch (IndexOutOfBoundsException e) {
+            Glide.with(holder.cardView.getContext()).load(R.mipmap.img_128).into(
+                    holder.thumbProduct);
+        }
 
         holder.contentProduct.setText(products.get(position).name);
 
@@ -63,8 +67,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
     public int getItemCount() {
         return products.size();
+    }
+
+    public void addProducts(List<ResponseBL.Product> newProducts) {
+        int oldLastPos = this.products.size();
+        this.products.addAll(newProducts);
+        notifyItemRangeInserted(oldLastPos, newProducts.size());
     }
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {

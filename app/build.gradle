@@ -41,6 +41,9 @@ android {
     configurations.all {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 
@@ -67,7 +70,7 @@ def permissionKarumiVersion = '4.1.0'
 
 def googleApiClientVersion = '1.22.0'
 
-def glideVersion = '4.0.0-RC0'
+def glideVersion = '3.7.0'
 def parcelerVersion = '1.1.8'
 
 dependencies {
@@ -79,6 +82,8 @@ dependencies {
     compile "com.android.support:design:$supportLibraryVersion"
     compile "com.android.support:support-v4:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
+
+    compile 'com.google.android:flexbox:0.2.6'
 
     compile "com.squareup.retrofit2:retrofit:$retrofit2Version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit2Version"
@@ -118,7 +123,6 @@ dependencies {
     compile "com.github.bumptech.glide:glide:$glideVersion"
 
     compile 'com.github.fiskurgit:ChipCloud:3.0.3'
-    compile 'com.google.android:flexbox:0.2.6'
 
     testCompile 'junit:junit:4.12'
 }
