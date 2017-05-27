@@ -124,7 +124,6 @@ public class PreviewActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        //TODO : Change this later (just for quick fix). Investigate cameraview | hint : put cam in separate thread
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
         this.finish();
     }

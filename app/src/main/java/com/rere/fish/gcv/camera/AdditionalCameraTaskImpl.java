@@ -1,5 +1,6 @@
 package com.rere.fish.gcv.camera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -14,8 +15,6 @@ import com.rere.fish.gcv.utils.FileUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 
 import timber.log.Timber;
 
@@ -60,6 +59,7 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
             super.onPostExecute(aVoid);
             Uri uri = Uri.fromFile(new File(finalPath));
             context.startActivity(PreviewActivity.createIntent(context, uri));
+            ((Activity) context).finish();
         }
 
         void saveImageToDirectory(String path, Bitmap bmp) {
@@ -90,14 +90,16 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
         }
 
         void scanImageToGallery(String path) {
-            MediaScannerConnection.scanFile(context, new String[]{path}, new String[]{"image/jpeg"}, null);
+            MediaScannerConnection.scanFile(context, new String[]{path}, new String[]{"image/jpeg"},
+                    null);
         }
 
         int getRotationImage(String path) {
             File f = new File(path);
             try {
                 ExifInterface exif = new ExifInterface(f.getAbsolutePath());
-                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL);
                 int rotationAlign = 0;
 
                 switch (orientation) {

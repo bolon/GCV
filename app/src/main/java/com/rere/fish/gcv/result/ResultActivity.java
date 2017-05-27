@@ -142,7 +142,6 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
 
     @Override
     public void onBackPressed() {
-        //TODO : Change this later. Investigate cameraview | hint : put cam in separate thread
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
         this.finish();
     }

@@ -172,8 +172,15 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         //        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
         //                loadJSONFromAsset());
 
-        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
-                jsonObject.toString());
+        RequestBody requestRaw;
+
+        if (jsonObject != null) {
+            requestRaw = RequestBody.create(MediaType.parse("application/json"),
+                    jsonObject.toString());
+        } else {
+            requestRaw = RequestBody.create(MediaType.parse("application/json"), new String(""));
+        }
+
 
         engineServices.getLabel(requestRaw).enqueue(new Callback<ResponseEngine>() {
             @Override
@@ -349,7 +356,6 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
             } catch (NullPointerException ex) {
                 Timber.e("Response from engine null, using gcv result instead");
                 eventListener.onReceivedKeywords(tempKeyWords);
-
             }
         }
     }
