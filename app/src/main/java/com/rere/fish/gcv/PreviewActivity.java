@@ -54,7 +54,7 @@ public class PreviewActivity extends AppCompatActivity {
 
     @OnClick(R.id.image_action_rotate)
     public void onRotateClicked() {
-        //TODO : STUB
+        cropImageView.rotateImage(90);
     }
 
 
