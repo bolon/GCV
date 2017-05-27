@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
@@ -19,6 +20,7 @@ import com.rere.fish.gcv.result.ResultActivity;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import fisk.chipcloud.ChipCloud;
 import fisk.chipcloud.ChipCloudConfig;
+import timber.log.Timber;
 
 /**
  * A fragment representing a list of Items.
@@ -39,6 +42,7 @@ public class ProductFragment extends Fragment {
 
     @BindView(R.id.list) RecyclerView recyclerView;
     @BindView(R.id.chipContainer) FlexboxLayout chipContainer;
+    @BindView(R.id.horizontalScroll) HorizontalScrollView horizontalScrollView;
     @BindView(R.id.text_product_status) TextView textViewProductStatus;
     private int mColumnCount = 2;
     private ResponseBL responseBL;
@@ -86,11 +90,12 @@ public class ProductFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
             }
-            productAdapter = new ProductAdapter(responseBL.getProducts(), productEventListener);
+            productAdapter = new ProductAdapter(getActivity(), responseBL.getProducts(), productEventListener);
             recyclerView.setAdapter(productAdapter);
+            setupChips(responseBL.getProducts());
         } else {
             textViewProductStatus.setVisibility(View.VISIBLE);
-            chipContainer.setVisibility(View.GONE);
+            horizontalScrollView.setVisibility(View.GONE);
         }
 
         recyclerView.addOnScrollListener(
@@ -102,6 +107,10 @@ public class ProductFragment extends Fragment {
                     }
                 });
 
+        return view;
+    }
+
+    private void setupChips(List<ResponseBL.Product> products) {
         ChipCloudConfig config = new ChipCloudConfig().selectMode(
                 ChipCloud.SelectMode.multi).checkedChipColor(
                 getContext().getResources().getColor(R.color.colorPrimaryLight)).checkedTextColor(
@@ -110,10 +119,27 @@ public class ProductFragment extends Fragment {
                 Color.parseColor("#666666")).useInsetPadding(true);
 
         ChipCloud chipCloud = new ChipCloud(getActivity(), chipContainer, config);
-        chipCloud.addChip("test1");
-        chipCloud.addChip("test2");
+        List<String> chipText = new ArrayList<>();
 
-        return view;
+        for (ResponseBL.Product p : products) {
+            if (!chipText.contains(p.category)) {
+                chipText.add(p.category);
+                Timber.i("categories_label " + p.category);
+            }
+        }
+
+        Timber.i("categories_size " + chipText.size());
+        chipCloud.addChips(chipText);
+        chipCloud.setSelectedIndexes(setSelectedChips(chipText));
+        chipCloud.setListener((index, isChecked, isUserClick) -> {
+            if (isUserClick) {
+                if (isChecked) {
+                    productAdapter.reDisplayProducts(chipText.get(index), true);
+                } else {
+                    productAdapter.reDisplayProducts(chipText.get(index), false);
+                }
+            }
+        });
     }
 
 
@@ -136,6 +162,13 @@ public class ProductFragment extends Fragment {
 
     public void doProductAddition(List<ResponseBL.Product> productList) {
         productAdapter.addProducts(productList);
+    }
+
+    public int[] setSelectedChips(List<String> selected) {
+        int[] temp = new int[selected.size()];
+        for (int i = 0; i < selected.size(); i++) temp[i] = i;
+
+        return temp;
     }
 
 

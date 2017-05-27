@@ -1,5 +1,7 @@
 package com.rere.fish.gcv.result.product;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,23 +15,28 @@ import com.rere.fish.gcv.R;
 import com.rere.fish.gcv.result.product.ProductFragment.OnProductsFragmentInteractionListener;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 /**
  * And dev
  */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-
     private final List<ResponseBL.Product> products;
+    private final List<ResponseBL.Product> filteredProducts = new ArrayList<>();
     private final OnProductsFragmentInteractionListener mListener;
+    private Context context;
 
-    public ProductAdapter(List<ResponseBL.Product> items, OnProductsFragmentInteractionListener listener) {
+    public ProductAdapter(Context context, List<ResponseBL.Product> items, OnProductsFragmentInteractionListener listener) {
         products = items;
         mListener = listener;
+        filteredProducts.addAll(products);
+        this.context = context;
     }
 
     @Override
@@ -41,7 +48,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(final ProductViewHolder holder, int position) {
-        holder.product = products.get(position);
+        holder.product = filteredProducts.get(position);
 
         try {
             Glide.with(holder.cardView.getContext()).load(holder.product.images.get(0)).placeholder(
@@ -52,7 +59,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                     holder.thumbProduct);
         }
 
-        holder.contentProduct.setText(products.get(position).name);
+        holder.contentProduct.setText(holder.product.name);
 
         String formattedPrice = (NumberFormat.getCurrencyInstance(new Locale("id", "ID")).format(
                 holder.product.price));
@@ -78,13 +85,41 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return filteredProducts.size();
     }
 
     public void addProducts(List<ResponseBL.Product> newProducts) {
         int oldLastPos = this.products.size();
         this.products.addAll(newProducts);
+        this.filteredProducts.addAll(newProducts);
         notifyItemRangeInserted(oldLastPos, newProducts.size());
+    }
+
+    public void reDisplayProducts(String category, boolean isAddition) {
+        if (isAddition) {
+            new Thread(() -> {
+                filteredProducts.addAll(0, getProductWithCategory(category));
+                ((Activity) context).runOnUiThread(this::notifyDataSetChanged);
+            }).start();
+        } else {
+            new Thread(() -> {
+                filteredProducts.removeAll(getProductWithCategory(category));
+                ((Activity) context).runOnUiThread(this::notifyDataSetChanged);
+            }).start();
+
+        }
+        Timber.i("current_product_size " + filteredProducts.size());
+        this.notifyDataSetChanged();
+    }
+
+    private List<ResponseBL.Product> getProductWithCategory(String category) {
+        List<ResponseBL.Product> tempProducts = new ArrayList<>();
+
+        for (ResponseBL.Product p : products) {
+            if (p.category.equals(category)) tempProducts.add(p);
+        }
+
+        return tempProducts;
     }
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
