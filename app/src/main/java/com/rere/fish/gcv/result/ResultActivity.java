@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
 import com.rere.fish.gcv.App;
+import com.rere.fish.gcv.MainActivity;
 import com.rere.fish.gcv.R;
 import com.rere.fish.gcv.modules.BukalapakInterface;
 import com.rere.fish.gcv.result.preexec.PreProcessFragment;
@@ -137,5 +138,12 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
 
         resurfaceFragment(PRODUCTS);
         FileUtil.cleanTempFile(getApplicationContext());
+    }
+
+    @Override
+    public void onBackPressed() {
+        //TODO : Change this later. Investigate cameraview | hint : put cam in separate thread
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        this.finish();
     }
 }

@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -48,9 +50,11 @@ import static android.view.View.GONE;
 public class CaptureImageFragment extends Fragment {
     @BindView(R.id.parentLayoutFragmentCapture) CoordinatorLayout parentLayout;
     @BindView(R.id.camera) CameraView cameraView;
-    @BindView(R.id.buttonCapture) CircularPulsingButton btnCapture;
+    @BindView(R.id.btn_capture) CircularPulsingButton btnCapture;
+    @BindView(R.id.btn_gallery) CircularPulsingButton btnGallery;
+    @BindView(R.id.btn_info) CircularPulsingButton btnInfo;
     @BindView(R.id.rootRePermission) RelativeLayout rePermissionLayout;
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener interactionListener;
 
     private AdditionalCameraTaskImpl additionalCameraTask;
     private MultiplePermissionsListener multiplePermissionsListener;
@@ -120,23 +124,30 @@ public class CaptureImageFragment extends Fragment {
         ButterKnife.bind(this, v);
 
         btnCapture.setClickable(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            btnCapture.setColor(getContext().getColor(R.color.alphaGray80));
-            btnCapture.setDrawable(
-                    getResources().getDrawable(R.mipmap.icon_camera, getActivity().getTheme()));
-        } else {
-            btnCapture.setColor(getResources().getColor(R.color.alphaGray80));
-            btnCapture.setDrawable(getResources().getDrawable(R.mipmap.icon_camera));
-        }
-
-        btnCapture.setAnimationDuration(300);
 
         if (!checkPermission()) {
             rePermissionLayout.setVisibility(View.VISIBLE);
         }
 
+        setupButton();
         setConfigCamera();
         return v;
+    }
+
+    private void setupButton() {
+        Drawable icon = getResources().getDrawable(R.drawable.ic_picture_black_24dp);
+
+        btnCapture.setColor(getResources().getColor(R.color.alphaGray80));
+        btnCapture.setDrawable(getResources().getDrawable(R.mipmap.icon_camera));
+        btnGallery.setColor(Color.TRANSPARENT);
+        icon.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
+        btnGallery.setDrawable(icon);
+        icon = getResources().getDrawable(R.drawable.ic_info_outline_black_24dp);
+        icon.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
+        btnInfo.setColor(Color.TRANSPARENT);
+        btnInfo.setDrawable(icon);
+
+        btnCapture.setAnimationDuration(300);
     }
 
     private void setConfigCamera() {
@@ -172,23 +183,28 @@ public class CaptureImageFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+            interactionListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(
                     context.toString() + " must implement OnLoadingFragmentInteractionListener");
         }
     }
 
-    @OnClick(R.id.buttonCapture)
+    @OnClick(R.id.btn_capture)
     public void onClickCaptureButton() {
         btnCapture.setVisibility(GONE);
         cameraView.captureImage();
     }
 
+    @OnClick(R.id.btn_gallery)
+    public void onClickGalleryButton() {
+        interactionListener.onButtonGalleryClicked();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        interactionListener = null;
     }
 
 
@@ -197,7 +213,15 @@ public class CaptureImageFragment extends Fragment {
         super.onResume();
         btnCapture.setVisibility(View.VISIBLE);
         if (checkPermission()) {
+            startCamera();
+        }
+    }
+
+    void startCamera() {
+        try {
             cameraView.start();
+        } catch (RuntimeException e) {
+            Timber.e("Failed to start camera " + e.getMessage());
         }
     }
 

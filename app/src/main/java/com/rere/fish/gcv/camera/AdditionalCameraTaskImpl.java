@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.media.ExifInterface;
 
@@ -57,7 +58,8 @@ public class AdditionalCameraTaskImpl implements AdditionalCameraTask {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            context.startActivity(PreviewActivity.createIntent(context, finalPath));
+            Uri uri = Uri.fromFile(new File(finalPath));
+            context.startActivity(PreviewActivity.createIntent(context, uri));
         }
 
         void saveImageToDirectory(String path, Bitmap bmp) {

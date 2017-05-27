@@ -16,12 +16,15 @@ import com.rere.fish.gcv.utils.FileUtil;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 public class PreviewActivity extends AppCompatActivity {
     private static String FILE_NAME = "vader3.png";
@@ -29,13 +32,12 @@ public class PreviewActivity extends AppCompatActivity {
     @BindView(R.id.tab_layout) LinearLayout tabLayout;
     @Inject SelfServiceInterface selfServiceInterface;
     private CropImageView cropImageView;
-    private String pathToFile;
 
-    public static Intent createIntent(Context context, String pathToImage) {
+    public static Intent createIntent(Context context, Uri imgUri) {
         Intent intent = new Intent(context, PreviewActivity.class);
         intent.setType(EXTRA_INTENT_IMAGE);
         intent.setAction(EXTRA_INTENT_IMAGE);
-        intent.putExtra(EXTRA_INTENT_IMAGE, pathToImage);
+        intent.putExtra(EXTRA_INTENT_IMAGE, imgUri.toString());
         return intent;
     }
 
@@ -83,12 +85,22 @@ public class PreviewActivity extends AppCompatActivity {
     }
 
     private void handleCapturedImage(Intent intent) {
-        pathToFile = intent.getStringExtra(EXTRA_INTENT_IMAGE);
-        cropImageView.setImageBitmap(getImageBitmapFromStorage(pathToFile));
+        InputStream input;
+        Bitmap bmp;
+
+        Uri fileUri = Uri.parse(intent.getStringExtra(EXTRA_INTENT_IMAGE));
+
+        try {
+            input = getContentResolver().openInputStream(fileUri);
+            bmp = BitmapFactory.decodeStream(input);
+            cropImageView.setImageBitmap(bmp);
+        } catch (FileNotFoundException e) {
+            Timber.e("No file found for URI : " + fileUri.getPath());
+        }
     }
 
     void handleSendImage(Intent intent) {
-        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             cropImageView.setImageUriAsync(imageUri);
             // Update UI to reflect image being shared
@@ -108,5 +120,12 @@ public class PreviewActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        //TODO : Change this later (just for quick fix). Investigate cameraview | hint : put cam in separate thread
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        this.finish();
     }
 }
