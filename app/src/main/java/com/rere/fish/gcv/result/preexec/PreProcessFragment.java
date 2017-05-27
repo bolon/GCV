@@ -29,6 +29,8 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.api.services.vision.v1.model.WebDetection;
 import com.google.api.services.vision.v1.model.WebEntity;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.rere.fish.gcv.App;
 import com.rere.fish.gcv.BuildConfig;
 import com.rere.fish.gcv.R;
@@ -128,9 +130,9 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     }
 
     private void callCloudVision(Bitmap bitmap) throws IOException {
-        new AsyncTask<Object, Void, String>() {
+        new AsyncTask<Object, Void, JsonObject>() {
             @Override
-            protected String doInBackground(Object... params) {
+            protected JsonObject doInBackground(Object... params) {
                 HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                 JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -160,18 +162,18 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
             }
 
             @Override
-            protected void onPostExecute(String s) {
-                onReceivedResultFromGCV(s);
+            protected void onPostExecute(JsonObject obj) {
+                onReceivedResultFromGCV(obj);
             }
         }.execute();
     }
 
-    private void callEngineService(String responseGCV) {
+    private void callEngineService(JsonObject jsonObject) {
         //        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
         //                loadJSONFromAsset());
 
         RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
-                responseGCV);
+                jsonObject.toString());
 
         engineServices.getLabel(requestRaw).enqueue(new Callback<ResponseEngine>() {
             @Override
@@ -182,7 +184,7 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
             @Override
             public void onFailure(Call<ResponseEngine> call, Throwable t) {
                 Timber.e("Failed to call engine services.. " + t.getMessage());
-                updateLayout(false, "<blink>Error occurred</blink>");
+                updateLayout(false, "Error occurred");
             }
         });
     }
@@ -249,10 +251,8 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         return json;
     }
 
-    private String convertResponseToString(BatchAnnotateImagesResponse response) throws IOException {
-        String message = "I found these things:<br/><br/>";
-
-        message += "done";
+    private JsonObject convertResponseToString(BatchAnnotateImagesResponse response) throws IOException {
+        String message = "";
 
         List<AnnotateImageResponse> responses = response.getResponses();
 
@@ -275,32 +275,28 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
                         "entity_get : " + e.getDescription() + " = " + e.getScore() + " --> annotate pos : " + responses.indexOf(
                                 a));
             }
-
-            Timber.i("tempkeywords : " + tempKeyWords);
-
-            /*WebDetection annotation = a.getWebDetection();
-            message += ("Entity:Id:Score");
-            message += ("===============");
-
-            for (WebEntity entity : annotation.getWebEntities()) {
-                message += (entity.getDescription() + " : " + entity.getEntityId() + " : "
-                        + entity.getScore());
-            }*/
-/*            message += ("\nPages with matching images: Score\n==");
-            for (WebPage page : annotation.getPagesWithMatchingImages()) {
-                message += (page.getUrl() + " : " + page.getScore());
-            }
-            message += ("\nPages with partially matching images: Score\n==");
-            for (WebImage image : annotation.getPartialMatchingImages()) {
-                message += (image.getUrl() + " : " + image.getScore());
-            }
-            message += ("\nPages with fully matching images: Score\n==");
-            for (WebImage image : annotation.getFullMatchingImages()) {
-                message += (image.getUrl() + " : " + image.getScore());
-            }*/
         }
 
-        return message;
+        JsonObject requestEngineObj = new JsonObject();
+        JsonArray jsonElements = new JsonArray();
+
+        for (AnnotateImageResponse a : responses) {
+            WebDetection detectionRes = a.getWebDetection();
+            message = detectionRes.getWebEntities().toString();
+
+            for (WebEntity w : detectionRes.getWebEntities()) {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("entityId", w.getEntityId());
+                jsonObject.addProperty("score", w.getScore());
+                jsonObject.addProperty("description", w.getDescription());
+
+                jsonElements.add(jsonObject);
+            }
+            break;
+        }
+        requestEngineObj.add("webEntities", jsonElements);
+
+        return requestEngineObj;
     }
 
     @Override
@@ -321,10 +317,10 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     }
 
     @Override
-    public void onReceivedResultFromGCV(String result) {
+    public void onReceivedResultFromGCV(JsonObject obj) {
         Timber.i("Calling from GCV is done...");
         updateLayout(false, "Filter the result");
-        callEngineService(result);
+        callEngineService(obj);
     }
 
     private void updateLayout(boolean isFinish, String text) {
@@ -347,8 +343,6 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         Timber.i("Calling from Engine is done...");
 
         if (eventListener != null) {
-            //TODO : Uncomment later to set keywords after filtering from engine
-
             try {
                 if (!resp.listResponsePair.isEmpty())
                     eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
