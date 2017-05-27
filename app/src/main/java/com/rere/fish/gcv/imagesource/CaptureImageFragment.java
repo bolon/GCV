@@ -7,10 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -135,14 +135,16 @@ public class CaptureImageFragment extends Fragment {
     }
 
     private void setupButton() {
-        Drawable icon = getResources().getDrawable(R.drawable.ic_picture_black_24dp);
+        VectorDrawableCompat icon = VectorDrawableCompat.create(getResources(),
+                R.drawable.ic_picture_black_24dp, null);
 
         btnCapture.setColor(getResources().getColor(R.color.alphaGray80));
         btnCapture.setDrawable(getResources().getDrawable(R.mipmap.icon_camera));
         btnGallery.setColor(Color.TRANSPARENT);
         icon.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
         btnGallery.setDrawable(icon);
-        icon = getResources().getDrawable(R.drawable.ic_info_outline_black_24dp);
+        icon = VectorDrawableCompat.create(getResources(), R.drawable.ic_info_outline_black_24dp,
+                null);
         icon.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_IN);
         btnInfo.setColor(Color.TRANSPARENT);
         btnInfo.setDrawable(icon);
