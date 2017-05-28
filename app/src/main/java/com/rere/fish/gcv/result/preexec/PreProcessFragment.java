@@ -263,26 +263,42 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
         List<AnnotateImageResponse> responses = response.getResponses();
 
-        for (AnnotateImageResponse a : responses) {
-            WebDetection detectionRes = a.getWebDetection();
+        try {
+            for (AnnotateImageResponse a : responses) {
+                WebDetection detectionRes = a.getWebDetection();
 
-            if (!detectionRes.getWebEntities().isEmpty()) {
-                for (WebEntity e : detectionRes.getWebEntities()) {
-                    if (e.getScore() > 0.8001) {
-                        tempKeyWords += e.getDescription() + "+";
-                        if (detectionRes.getWebEntities().indexOf(e) == 1) break;
+                if (!detectionRes.getWebEntities().isEmpty()) {
+                    for (WebEntity e : detectionRes.getWebEntities()) {
+                        if (e.getScore() > 0.8001) {
+                            tempKeyWords += e.getDescription() + "+";
+                            if (detectionRes.getWebEntities().indexOf(e) == 1) break;
+                        }
                     }
                 }
-            } else {
-                tempKeyWords += "Ikan lele";
-            }
 
-            for (WebEntity e : detectionRes.getWebEntities()) {
-                Timber.i(
-                        "entity_get : " + e.getDescription() + " = " + e.getScore() + " --> annotate pos : " + responses.indexOf(
-                                a));
+                for (WebEntity e : detectionRes.getWebEntities()) {
+                    Timber.i(
+                            "entity_get : " + e.getDescription() + " = " + e.getScore() + " --> annotate pos : " + responses.indexOf(
+                                    a));
+                }
             }
+        } catch (NullPointerException ex) {
+            tempKeyWords += "Ikan lele";
+
+            Timber.e("Result from GCV is null. Send ikan lele instead ( ͡° ͜ʖ ͡°)");
+            JsonObject requestEngineObj = new JsonObject();
+            JsonArray jsonElements = new JsonArray();
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("entityId", "");
+            jsonObject.addProperty("score", "");
+            jsonObject.addProperty("description", "");
+
+            jsonElements.add(jsonObject);
+            requestEngineObj.add("webEntities", jsonElements);
+            return requestEngineObj;
         }
+
 
         JsonObject requestEngineObj = new JsonObject();
         JsonArray jsonElements = new JsonArray();
