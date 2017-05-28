@@ -6,14 +6,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.flurgle.camerakit.CameraListener;
@@ -26,9 +28,11 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.CompositeMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
-import com.rere.fish.gcv.camera.AdditionalCameraTaskImpl;
 import com.rere.fish.gcv.modules.BukalapakInterface;
+import com.rere.fish.gcv.result.ResultActivity;
 import com.rere.fish.gcv.uicustoms.CircularPulsingButton;
+import com.rere.fish.gcv.utils.FileUtil;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.List;
 
@@ -40,19 +44,22 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
     final int IMG_REQ = 1;
 
     @BindView(R.id.rootView) CoordinatorLayout rootView;
+    @BindView(R.id.rootCameraView) RelativeLayout cameraViewContainer;
     @BindView(R.id.camera) CameraView cameraView;
     @BindView(R.id.btn_capture) CircularPulsingButton btnCapture;
     @BindView(R.id.btn_gallery) CircularPulsingButton btnGallery;
     @BindView(R.id.btn_info) CircularPulsingButton btnInfo;
     @BindView(R.id.rootRePermission) RelativeLayout rePermissionLayout;
+    @BindView(R.id.crop_layout_container) CoordinatorLayout cropLayoutContainer;
+    @BindView(R.id.cropImageView) CropImageView cropImageView;
 
     @Inject BukalapakInterface bukalapakInterface;
-    private AdditionalCameraTaskImpl additionalCameraTask;
     private MultiplePermissionsListener multiplePermissionsListener;
 
     @Override
@@ -66,14 +73,25 @@ public class MainActivity extends AppCompatActivity {
         btnCapture.setClickable(true);
 
         if (!checkPermission()) {
-            rePermissionLayout.setVisibility(View.VISIBLE);
+            rePermissionLayout.setVisibility(VISIBLE);
         }
 
         setConfigCamera();
         setupButton();
+        setupPermissionListener();
 
-        additionalCameraTask = new AdditionalCameraTaskImpl(this);
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
 
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                handleSendImage(intent);
+            }
+        }
+    }
+
+    private void setupPermissionListener() {
         multiplePermissionsListener = new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -96,9 +114,40 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    private void handleSendImage(Intent intent) {
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            cropImageView.setImageUriAsync(imageUri);
+            resurfaceView(false);
+        }
+    }
+
+    @OnClick(R.id.text_action_cancel)
+    public void onCancelClicked() {
+        resurfaceView(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (cropLayoutContainer.getVisibility() == VISIBLE) resurfaceView(true);
+        else super.onBackPressed();
+    }
+
+    @OnClick(R.id.text_action_next)
+    public void onNextClicked() {
+        String croppedImagePath = FileUtil.saveCroppedImage(getApplicationContext(),
+                cropImageView.getCroppedImage(), FileUtil.generateRandomString());
+        startActivity(ResultActivity.createIntent(getApplicationContext(), croppedImagePath));
+    }
+
+    @OnClick(R.id.image_action_rotate)
+    public void onRotateClicked() {
+        cropImageView.rotateImage(90);
+    }
+
     @OnClick(R.id.btn_capture)
     public void onClickCaptureButton() {
-        btnCapture.setVisibility(GONE);
+        //btnCapture.setVisibility(GONE);
         cameraView.captureImage();
     }
 
@@ -134,8 +183,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == IMG_REQ && resultCode == RESULT_OK && data != null & data.getData() != null) {
-            startActivity(PreviewActivity.createIntent(getApplicationContext(), data.getData()));
-            this.finish();
+            cropImageView.setImageUriAsync(data.getData());
+            resurfaceView(false);
         }
     }
 
@@ -146,9 +195,8 @@ public class MainActivity extends AppCompatActivity {
             public void onPictureTaken(byte[] picture) {
                 super.onPictureTaken(picture);
 
-                Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-
-                additionalCameraTask.onFinishCamera(result);
+                new TransformBitmap().execute(picture);
+                //additionalCameraTask.onFinishCamera(result);
             }
         });
     }
@@ -156,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        btnCapture.setVisibility(View.VISIBLE);
         if (checkPermission()) {
             startCamera();
         }
@@ -192,6 +239,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    void resurfaceView(boolean isCamera) {
+        if (isCamera) {
+            cropLayoutContainer.setVisibility(GONE);
+            cameraViewContainer.setVisibility(VISIBLE);
+            cropImageView.clearImage();
+        } else {
+            cropLayoutContainer.setVisibility(VISIBLE);
+            cameraViewContainer.setVisibility(GONE);
+        }
+    }
+
     private void setupButton() {
         VectorDrawableCompat icon = VectorDrawableCompat.create(getResources(),
                 R.drawable.ic_picture_black_24dp, null);
@@ -210,4 +268,24 @@ public class MainActivity extends AppCompatActivity {
         btnCapture.setAnimationDuration(300);
     }
 
+    private class TransformBitmap extends AsyncTask<byte[], Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(byte[]... pic) {
+            byte[] picture = pic[0];
+            Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+
+            Matrix matrix = new Matrix();
+            matrix.setRotate(90, (float) result.getWidth() / 2, (float) result.getHeight() / 2);
+
+            return Bitmap.createBitmap(result, 0, 0, result.getWidth(), result.getHeight(), matrix,
+                    true);
+
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            cropImageView.setImageBitmap(bitmap);
+            resurfaceView(false);
+        }
+    }
 }

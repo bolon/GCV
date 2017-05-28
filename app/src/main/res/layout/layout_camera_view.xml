@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootCameraView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <com.flurgle.camerakit.CameraView
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"/>
+
+
+    <com.rere.fish.gcv.uicustoms.CircularPulsingButton
+        android:id="@+id/btn_gallery"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/bottom_smallbtn_margin"
+        android:layout_marginStart="@dimen/side_smallbtn_margin"/>
+
+    <com.rere.fish.gcv.uicustoms.CircularPulsingButton
+        android:id="@+id/btn_capture"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/bottom_capturebtn_margin"/>
+
+    <com.rere.fish.gcv.uicustoms.CircularPulsingButton
+        android:id="@+id/btn_info"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/bottom_smallbtn_margin"
+        android:layout_marginEnd="@dimen/side_smallbtn_margin"/>
+</RelativeLayout>

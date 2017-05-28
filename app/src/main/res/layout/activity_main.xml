@@ -7,61 +7,12 @@
     android:layout_height="match_parent"
     tools:context="com.rere.fish.gcv.MainActivity">
 
-    <RelativeLayout
-        android:id="@+id/rootCameraView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/black">
+    <include layout="@layout/layout_camera_view"/>
 
-        <com.flurgle.camerakit.CameraView
-            android:id="@+id/camera"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"/>
+    <include layout="@layout/layout_request_permission"/>
 
-
-        <com.rere.fish.gcv.uicustoms.CircularPulsingButton
-            android:id="@+id/btn_gallery"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="@dimen/bottom_smallbtn_margin"
-            android:layout_marginStart="@dimen/side_smallbtn_margin"/>
-
-        <com.rere.fish.gcv.uicustoms.CircularPulsingButton
-            android:id="@+id/btn_capture"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/bottom_capturebtn_margin"/>
-
-        <com.rere.fish.gcv.uicustoms.CircularPulsingButton
-            android:id="@+id/btn_info"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="@dimen/bottom_smallbtn_margin"
-            android:layout_marginEnd="@dimen/side_smallbtn_margin"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rootRePermission"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorSecondaryDark"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/btnRequestPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Reload Camera"
-            android:textAllCaps="false"/>
-    </RelativeLayout>
-
+    <include
+        layout="@layout/layout_crop_view"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>
