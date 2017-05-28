@@ -274,21 +274,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class TransformBitmap extends AsyncTask<byte[], Void, Bitmap> {
+        Bitmap result;
+
         @Override
         protected Bitmap doInBackground(byte[]... pic) {
             byte[] picture = pic[0];
-            Bitmap result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            result = BitmapFactory.decodeByteArray(picture, 0, picture.length);
 
             Matrix matrix = new Matrix();
             matrix.setRotate(90, (float) result.getWidth() / 2, (float) result.getHeight() / 2);
 
             return Bitmap.createBitmap(result, 0, 0, result.getWidth(), result.getHeight(), matrix,
                     true);
-
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+            result.recycle();
             cropImageView.setImageBitmap(bitmap);
             resurfaceView(false);
         }
