@@ -127,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
         resurfaceView(true);
     }
 
+    @OnClick(R.id.btn_info)
+    public void onInfoClicked() {
+        startActivity(new Intent(getApplicationContext(), InfoActivity.class));
+    }
+
     @Override
     public void onBackPressed() {
         if (cropLayoutContainer.getVisibility() == VISIBLE) resurfaceView(true);

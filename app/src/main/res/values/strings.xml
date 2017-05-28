@@ -19,4 +19,10 @@
     <string name="all_permissions_denied_feedback">Please allow all permission</string>
     <string name="action_next">next</string>
     <string name="no_item_found">No item found :(</string>
+    <string name="text_how_to">
+        asd
+    </string>
+    <string name="text_thanks">Thanks to these awesome libs :</string>
+    <string name="text_disclaimer">Disclaimer : Karena membutuhkan data yg sangat banyak untuk bisa memberi label pada semua gambar, maka saat ini hanya berfokus pada footwear. Cakupan akan diperluas seiring pengembangan berlangsung.</string>
+    <string name="text_owner">Ikan rere 2017 - BLDC</string>
 </resources>
