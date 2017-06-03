@@ -109,12 +109,18 @@ public class ResultActivity extends AppCompatActivity implements ProductFragment
                 new Callback<ResponseBL>() {
                     @Override
                     public void onResponse(Call<ResponseBL> call, Response<ResponseBL> response) {
-                        if (response.isSuccessful()) {
-                            if (page == INITIAL_PAGE) onReceivedInitialBLResult(response.body());
-                            else ((ProductFragment) getSupportFragmentManager().findFragmentByTag(
-                                    PRODUCTS)).doProductAddition(response.body().getProducts());
-                        } else Timber.e("Can't get products");
-
+                        try {
+                            if (response.isSuccessful()) {
+                                if (page == INITIAL_PAGE)
+                                    onReceivedInitialBLResult(response.body());
+                                else
+                                    ((ProductFragment) getSupportFragmentManager().findFragmentByTag(
+                                            PRODUCTS)).doProductAddition(
+                                            response.body().getProducts());
+                            } else Timber.e("Can't get products");
+                        } catch (NullPointerException ex) {
+                            Timber.e("Fail to load product to non-exist fragment");
+                        }
                         Timber.i("url_request : " + call.request().url().toString());
                     }
 
