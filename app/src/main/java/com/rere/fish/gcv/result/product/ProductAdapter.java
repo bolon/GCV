@@ -52,10 +52,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         try {
             Glide.with(holder.cardView.getContext()).load(holder.product.images.get(0)).placeholder(
-                    R.mipmap.img_128).centerCrop().error(R.mipmap.img_128).into(
+                    R.mipmap.ic_placeholder).centerCrop().error(R.mipmap.ic_placeholder).into(
                     holder.thumbProduct);
         } catch (IndexOutOfBoundsException e) {
-            Glide.with(holder.cardView.getContext()).load(R.mipmap.img_128).into(
+            Glide.with(holder.cardView.getContext()).load(R.mipmap.ic_placeholder).into(
                     holder.thumbProduct);
         }
 
