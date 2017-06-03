@@ -29,13 +29,6 @@ public class App extends Application {
         //Timber for logging -> no pun intended
         Timber.plant(new Timber.DebugTree());
 
-        // Configure default configuration for Realm
-/*        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
-                .deleteRealmIfMigrationNeeded()
-                .schemaVersion(SCHEMA_VERSION)
-                .build();
-        Realm.setDefaultConfiguration(realmConfig);*/
-
         //Iconify
         Iconify.with(new FontAwesomeModule());
 

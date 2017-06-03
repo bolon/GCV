@@ -169,16 +169,13 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
     }
 
     private void callEngineService(JsonObject jsonObject) {
-        //        RequestBody requestRaw = RequestBody.create(MediaType.parse("application/json"),
-        //                loadJSONFromAsset());
-
         RequestBody requestRaw;
 
         if (jsonObject != null) {
             requestRaw = RequestBody.create(MediaType.parse("application/json"),
                     jsonObject.toString());
         } else {
-            requestRaw = RequestBody.create(MediaType.parse("application/json"), new String(""));
+            requestRaw = RequestBody.create(MediaType.parse("application/json"), "");
         }
 
 
