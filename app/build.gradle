@@ -47,7 +47,7 @@ android {
 
 def getPropertyFromPrivateFile(String property) {
     Properties properties = new Properties()
-    properties.load(new FileInputStream("$projectDir/key"))
+    properties.load(new FileInputStream("$projectDir/key.properties"))
 
     System.out.println(properties.getProperty(property));
 

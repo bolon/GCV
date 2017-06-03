@@ -51,7 +51,7 @@ captures/
 google-services.json
 
 #Key
-key
+key.properties
 
 #DSStore
 .DS_Store
