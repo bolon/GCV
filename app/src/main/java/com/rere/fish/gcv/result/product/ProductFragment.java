@@ -1,5 +1,7 @@
 package com.rere.fish.gcv.result.product;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.rere.fish.gcv.R;
+import com.rere.fish.gcv.result.OnChipContainerInteraction;
 import com.rere.fish.gcv.result.ResultActivity;
 
 import org.parceler.Parcels;
@@ -36,13 +39,13 @@ import timber.log.Timber;
  * Activities containing this fragment MUST implement the {@link OnProductsFragmentInteractionListener}
  * interface.
  */
-public class ProductFragment extends Fragment {
+public class ProductFragment extends Fragment implements OnChipContainerInteraction {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_PRODUCTS = "products";
 
     @BindView(R.id.list) RecyclerView recyclerView;
     @BindView(R.id.chipContainer) FlexboxLayout chipContainer;
-    @BindView(R.id.horizontalScroll) HorizontalScrollView horizontalScrollView;
+    @BindView(R.id.horizontalScroll) HorizontalScrollView chipHorizontalScrollView;
     @BindView(R.id.text_product_status) TextView textViewProductStatus;
     private int mColumnCount = 2;
     private ResponseBL responseBL;
@@ -90,16 +93,18 @@ public class ProductFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
             }
-            productAdapter = new ProductAdapter(getActivity(), responseBL.getProducts(), productEventListener);
+            productAdapter = new ProductAdapter(getActivity(), responseBL.getProducts(),
+                    productEventListener);
             recyclerView.setAdapter(productAdapter);
             setupChips(responseBL.getProducts());
         } else {
             textViewProductStatus.setVisibility(View.VISIBLE);
-            horizontalScrollView.setVisibility(View.GONE);
+            chipHorizontalScrollView.setVisibility(View.GONE);
         }
 
         recyclerView.addOnScrollListener(
-                new InfiniteScrollListener((LinearLayoutManager) recyclerView.getLayoutManager()) {
+                new InfiniteScrollListener((LinearLayoutManager) recyclerView.getLayoutManager(),
+                        this) {
                     @Override
                     public void onLoadMore(int current_page) {
                         productEventListener.onRequestedMoreProducts(current_page,
@@ -169,6 +174,29 @@ public class ProductFragment extends Fragment {
         for (int i = 0; i < selected.size(); i++) temp[i] = i;
 
         return temp;
+    }
+
+    @Override
+    public void onChipViewStateChange(boolean isShow) {
+        if (isShow) {
+            chipHorizontalScrollView.animate().alpha(100f).setDuration(300).setListener(
+                    new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            chipHorizontalScrollView.setVisibility(View.VISIBLE);
+                        }
+                    });
+        } else {
+            chipHorizontalScrollView.animate().alpha(0.0f).setDuration(300).setListener(
+                    new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            chipHorizontalScrollView.setVisibility(View.GONE);
+                        }
+                    });
+        }
     }
 
 
