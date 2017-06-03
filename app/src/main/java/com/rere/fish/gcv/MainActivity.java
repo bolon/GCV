@@ -16,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.flurgle.camerakit.CameraListener;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 handleSendImage(intent);
             }
         }
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     }
 
     private void setupPermissionListener() {
