@@ -365,7 +365,9 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
         if (eventListener != null) {
             try {
                 if (!resp.listResponsePair.isEmpty())
-                    eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
+                    if (!resp.listResponsePair.get(0).keyword.equals(""))
+                        eventListener.onReceivedKeywords(unifiedKeywords(resp.listResponsePair));
+                    else eventListener.onReceivedKeywords(tempKeyWords);
             } catch (NullPointerException ex) {
                 Timber.e("Response from engine null, using gcv result instead");
                 eventListener.onReceivedKeywords(tempKeyWords);
