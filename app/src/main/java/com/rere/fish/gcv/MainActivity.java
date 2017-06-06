@@ -17,7 +17,6 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.flurgle.camerakit.CameraListener;
@@ -46,10 +45,6 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
-import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
-import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-import static android.view.View.SYSTEM_UI_FLAG_LOW_PROFILE;
 import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
