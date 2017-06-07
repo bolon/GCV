@@ -1,6 +1,8 @@
 package com.rere.fish.gcv;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,6 +21,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.flurgle.camerakit.CameraListener;
 import com.flurgle.camerakit.CameraView;
 import com.karumi.dexter.Dexter;
@@ -30,6 +35,7 @@ import com.karumi.dexter.listener.multi.CompositeMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 import com.rere.fish.gcv.modules.BukalapakInterface;
+import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.ResultActivity;
 import com.rere.fish.gcv.uicustoms.CircularPulsingButton;
 import com.rere.fish.gcv.utils.FileUtil;
@@ -42,14 +48,23 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
-    final int IMG_REQ = 1;
+    public static final int REQUEST_CODE_NOTIF = 666;
+    public static final String EXTRA_NOTIF_URL = "extra_notif_url";
+    public static final String EXTRA_NOTIF_ID = "extra_notif_id";
+    public static final String ACTION_NOTIF = "action_notif";
 
+    final int IMG_REQ = 1;
     @BindView(R.id.rootView) CoordinatorLayout rootView;
     @BindView(R.id.rootCameraView) RelativeLayout cameraViewContainer;
     @BindView(R.id.camera) CameraView cameraView;
@@ -61,7 +76,18 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.cropImageView) CropImageView cropImageView;
 
     @Inject BukalapakInterface bukalapakInterface;
+    @Inject SelfServiceInterface engineInterface;
     private MultiplePermissionsListener multiplePermissionsListener;
+
+    public static Intent createIntentNotif(Context context, String url, int notificationId) {
+        Intent i = new Intent(context, MainActivity.class);
+        i.putExtra(EXTRA_NOTIF_URL, url);
+        i.putExtra(EXTRA_NOTIF_ID, notificationId);
+        i.setAction(ACTION_NOTIF);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        return i;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,17 +107,64 @@ public class MainActivity extends AppCompatActivity {
         setupButton();
         setupPermissionListener();
 
+        hideSystemUI();
+
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
 
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
+        if (action == null) return;
+
+        if (action.equals(Intent.ACTION_SEND) && type != null) {
             if (type.startsWith("image/")) {
                 handleSendImage(intent);
             }
-        }
+        } else if (action.equals(ACTION_NOTIF)) {
+            resurfaceView(false);
 
-        hideSystemUI();
+            int id = intent.getIntExtra(EXTRA_NOTIF_ID, -1);
+            String originalUrl = intent.getStringExtra(EXTRA_NOTIF_URL);
+
+            Timber.i("url_notif : " + originalUrl);
+            fetchImageFromInstagram(originalUrl);
+
+            clearNotification(id);
+        }
+    }
+
+    private void fetchImageFromInstagram(String originalUrl) {
+        engineInterface.getUrlImgInstagram(originalUrl).enqueue(
+                new Callback<ResponseScrapeImage>() {
+                    @Override
+                    public void onResponse(Call<ResponseScrapeImage> call, Response<ResponseScrapeImage> response) {
+                        if (response.isSuccessful()) {
+                            String urlImg = response.body().url;
+                            Timber.i("ori url insta : " + urlImg);
+                            loadToCropView(urlImg);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseScrapeImage> call, Throwable t) {
+                        Timber.e("Failed to fetch img Instagram..");
+                    }
+                });
+    }
+
+    private void loadToCropView(String url) {
+        Glide.with(getApplicationContext()).load(url).asBitmap().into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                Timber.i("Resource ready...");
+                cropImageView.setImageBitmap(resource);
+            }
+        });
+    }
+
+    private void clearNotification(int id) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(
+                NOTIFICATION_SERVICE);
+        notificationManager.cancel(id);
     }
 
     @Override
@@ -180,9 +253,13 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMG_REQ);
     }
 
+    private boolean checkIfUrl(String s) {
+        return (s.matches(
+                "(http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"));
+    }
+
     @OnClick(R.id.btnRequestPermission)
     public void onClickButtonPermission() {
-        Timber.i("checkpermission", checkPermission());
         if (!checkPermission()) {
             Dexter.withActivity(this).withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
