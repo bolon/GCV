@@ -25,8 +25,11 @@ import com.google.api.services.vision.v1.model.AnnotateImageRequest;
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
+import com.google.api.services.vision.v1.model.ColorInfo;
+import com.google.api.services.vision.v1.model.DominantColorsAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.api.services.vision.v1.model.ImageProperties;
 import com.google.api.services.vision.v1.model.WebDetection;
 import com.google.api.services.vision.v1.model.WebEntity;
 import com.google.gson.JsonArray;
@@ -38,6 +41,7 @@ import com.rere.fish.gcv.modules.BukalapakInterface;
 import com.rere.fish.gcv.modules.SelfServiceInterface;
 import com.rere.fish.gcv.result.OnFinishEngineProcess;
 import com.rere.fish.gcv.result.OnFinishVisionProcess;
+import com.rere.fish.gcv.utils.ColorUtil;
 import com.rere.fish.gcv.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -45,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -223,19 +228,37 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
             // add the features we want
             annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                Feature labelDetection = new Feature();
-                labelDetection.setType("WEB_DETECTION");
-                labelDetection.setMaxResults(10);
-                add(labelDetection);
+                addAll(setFeature());
             }});
 
             // Add the list of one thing to the request
             add(annotateImageRequest);
-
         }});
 
         return batchAnnotateImagesRequest;
     }
+
+    private Collection<? extends Feature> setFeature() {
+        List<Feature> features = new ArrayList<>();
+        Feature webDetection = new Feature();
+        webDetection.setType("WEB_DETECTION");
+        webDetection.setMaxResults(10);
+
+        Feature imgPropDetection = new Feature();
+        imgPropDetection.setType("IMAGE_PROPERTIES");
+        imgPropDetection.setMaxResults(1);
+
+        Feature logoDetection = new Feature();
+        logoDetection.setType("LOGO_DETECTION");
+        logoDetection.setMaxResults(1);
+
+        features.add(webDetection);
+        features.add(imgPropDetection);
+        features.add(logoDetection);
+
+        return features;
+    }
+
 
     private String loadJSONFromAsset() {
         String json = null;
@@ -257,6 +280,8 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
     private JsonObject convertResponseToString(BatchAnnotateImagesResponse response) throws IOException {
         String message = "";
+        String colorDominantDetected = "Undetected";
+        String logoDetected = "";
 
         List<AnnotateImageResponse> responses = response.getResponses();
 
@@ -274,9 +299,25 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
                 }
 
                 for (WebEntity e : detectionRes.getWebEntities()) {
+                    Timber.i("entity_get : " + e.getDescription() + " = " + e.getScore());
+                }
+
+                ImageProperties imageProperties = a.getImagePropertiesAnnotation();
+                if (!imageProperties.getDominantColors().isEmpty()) {
+                    DominantColorsAnnotation colors = imageProperties.getDominantColors();
+                    ColorInfo c = colors.getColors().get(0);
+                    colorDominantDetected = new ColorUtil().getColorNameFromColor(c.getColor());
                     Timber.i(
-                            "entity_get : " + e.getDescription() + " = " + e.getScore() + " --> annotate pos : " + responses.indexOf(
-                                    a));
+                            "color : " + c.getColor().getRed() + "," + c.getColor().getGreen() + "," + c.getColor().getBlue() + " = " + c.getScore() + "--->" + new ColorUtil().getColorNameFromColor(
+                                    c.getColor()));
+                }
+
+                try {
+                    String logoDesc = a.getLogoAnnotations().get(0).getDescription();
+                    Timber.i("logo detected : " + logoDesc);
+                    logoDetected = logoDesc;
+                } catch (NullPointerException ex) {
+                    Timber.e("Logo is null, do nothing...");
                 }
             }
         } catch (NullPointerException ex) {
@@ -293,6 +334,7 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
 
             jsonElements.add(jsonObject);
             requestEngineObj.add("webEntities", jsonElements);
+
             return requestEngineObj;
         }
 
@@ -314,9 +356,22 @@ public class PreProcessFragment extends Fragment implements OnFinishVisionProces
             }
             break;
         }
+
+        jsonElements.add(populateJSONObjectEngine("color", "666", colorDominantDetected));
+        jsonElements.add(populateJSONObjectEngine("logo", "666", logoDetected));
+
         requestEngineObj.add("webEntities", jsonElements);
 
         return requestEngineObj;
+    }
+
+    private JsonObject populateJSONObjectEngine(String entityId, String score, String desc) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("entityId", entityId);
+        jsonObject.addProperty("score", score);
+        jsonObject.addProperty("description", desc);
+
+        return jsonObject;
     }
 
     @Override
