@@ -48,8 +48,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -287,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setConfigCamera() {
+        cropImageView.setShowProgressBar(false);
         cameraView.setJpegQuality(70);
         cameraView.setCameraListener(new CameraListener() {
             @Override

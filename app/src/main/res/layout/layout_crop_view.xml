@@ -8,6 +8,21 @@
     android:background="@android:color/black">
 
 
+    <FrameLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.joanzapata.iconify.widget.IconTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="{fa-circle-o-notch spin}"
+            android:textSize="48sp"
+            android:textColor="@android:color/white"/>
+    </FrameLayout>
+
     <com.theartofdev.edmodo.cropper.CropImageView
         android:id="@+id/cropImageView"
         android:layout_width="match_parent"
@@ -24,9 +39,5 @@
 
     <include
         layout="@layout/bottom_action_preview_fragment"/>
-
-    <!--app:cropBorderLineColor="@android:color/holo_green_light"-->
-    <!--app:cropGuidelinesColor="@android:color/holo_red_dark"-->
-
 
 </android.support.design.widget.CoordinatorLayout>
