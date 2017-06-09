@@ -43,9 +43,9 @@ public class CBWatcherService extends Service {
                 MainActivity.REQUEST_CODE_NOTIF, i, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Notification n = new Notification.Builder(this).setSmallIcon(
-                R.mipmap.ic_launcher).setContentTitle("Instagram link detected").setContentText(
-                "Want to process this link?").addAction(0, "PROCEED", pendingIntent).setAutoCancel(
-                true).build();
+                R.mipmap.ic_launcher).setContentIntent(pendingIntent).setContentTitle(
+                "Instagram link detected").setContentText("Want to process this link?").addAction(0,
+                "PROCEED", pendingIntent).setAutoCancel(true).build();
 
         if (!s.contains(IG_REGEX)) return;
 
